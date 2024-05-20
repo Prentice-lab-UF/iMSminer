@@ -9,6 +9,7 @@ iMSminer Beta
 - **Quick Start**: https://drive.google.com/drive/folders/12Qjz5zlSMwL42W0X_yZxZVZaVXtlhylo?usp=drive_link 
 - **Setup Instructions**: {insert setup tutorials}
 - **Support Group**: {insert Google support}
+- **Feedback Forms**: {insert Google forms}
 
 ## **Features**
 - Interactive question prompting to enhance user-friendliness
