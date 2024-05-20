@@ -5,8 +5,8 @@ iMSminer Beta
 
 ## **Portals**
 - **Website**: {insert website link}
-- **Documentation**: {insert documentation link}
-- **Quick Start**: {insert google drive}
+- **Documentation**: https://github.com/Prentice-lab-UF/iMSminer/blob/main/iMSminer/docs/_build/html/index.html
+- **Quick Start**: https://drive.google.com/drive/folders/12Qjz5zlSMwL42W0X_yZxZVZaVXtlhylo?usp=drive_link
 - **Setup Instructions**: {insert setup tutorials}
 - **Support Group**: {insert Google support}
 
