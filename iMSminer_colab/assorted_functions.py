@@ -25,7 +25,7 @@ import typing as ty
 import time
 import os
 import gc
-os.chdir("/home/yutinlin/workspace/iMSminer")
+os.chdir("/content/drive/My Drive/Colab Notebooks/iMSminer_colab/")
 from utilities import check_xy, convert_peak_values_to_index, convert_peak_values_to_index_gpu, generate_function, shift, time_loop
 import ImzMLParser_chunk
 from ImzMLParser_chunk import ImzMLParser_chunk

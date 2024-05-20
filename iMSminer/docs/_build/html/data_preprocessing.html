@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_preprocessing module &mdash; iMSminer_beta 0.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+      <link rel="stylesheet" href="_static/fonts.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="run module" href="run.html" />
+    <link rel="prev" title="data_analysis module" href="data_analysis.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            iMSminer_beta
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">iMSminer</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="assorted_functions.html">assorted_functions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_analysis.html">data_analysis module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">data_preprocessing module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="run.html">run module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">iMSminer_beta</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">iMSminer</a></li>
+      <li class="breadcrumb-item active">data_preprocessing module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/data_preprocessing.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-data_preprocessing">
+<span id="data-preprocessing-module"></span><h1>data_preprocessing module<a class="headerlink" href="#module-data_preprocessing" title="Permalink to this heading"></a></h1>
+<p>&#64;author: Yu Tin Lin (<a class="reference external" href="mailto:yutinlin&#37;&#52;&#48;stanford&#46;edu">yutinlin<span>&#64;</span>stanford<span>&#46;</span>edu</a>)
+&#64;author: Haohui Bao (<a class="reference external" href="mailto:susanab20020911&#37;&#52;&#48;gmail&#46;com">susanab20020911<span>&#64;</span>gmail<span>&#46;</span>com</a>)
+&#64;author: Boone M. Prentice (<a class="reference external" href="mailto:booneprentice&#37;&#52;&#48;ufl&#46;chem&#46;edu">booneprentice<span>&#64;</span>ufl<span>&#46;</span>chem<span>&#46;</span>edu</a>)</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="data_preprocessing.Preprocess">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_preprocessing.</span></span><span class="sig-name descname"><span class="pre">Preprocess</span></span><a class="reference internal" href="_modules/data_preprocessing.html#Preprocess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_preprocessing.Preprocess" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Contains functions to import imzML, generate interactive mean mass spectrum, perform peak picking, mass alignment, and peak integration</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_preprocessing.Preprocess.peak_pick">
+<span class="sig-name descname"><span class="pre">peak_pick</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">percent_RAM</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'point'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rel_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generate_spectrum</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_preprocessing.html#Preprocess.peak_pick"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_preprocessing.Preprocess.peak_pick" title="Permalink to this definition"></a></dt>
+<dd><p>Perform peak picking to locate signals above a defined LOQ (k * noise) by specifying k, calculating noise, and at specified minimum distance between peaks</p>
+<dl class="simple">
+<dt>percent_RAM<span class="classifier">int, optional</span></dt><dd><p>percent available RAM occupied by chunk, by default 5</p>
+</dd>
+<dt>method<span class="classifier">str, optional</span></dt><dd><p>method of computing noise, by default “point”
+method <cite>point</cite> takes specified lower and upper m/z bound of a region in spectrum without signals and compute its standard deviation to define noise level
+method <cite>specify_noise</cite> takes user-specified noise level
+method <cite>automatic</cite> computes standard deviation of non-outliers (&lt; k * z_score), where k is specified by user
+method <cite>binning</cite> re-bins mass spectra (userful for compressed data with inhomogeneous shapes), then computes noise using method “automatic”</p>
+</dd>
+<dt>rel_height<span class="classifier">float, optional</span></dt><dd><p>peak height cutoff for peak integration, by default 0.9</p>
+</dd>
+<dt>generate_spectrum<span class="classifier">bool, optional</span></dt><dd><p>render average spectrum to directory specified by user, by default True</p>
+</dd>
+<dt>lwr<span class="classifier">float</span></dt><dd><p>lower m/z bound of a region in spectrum without signals</p>
+</dd>
+<dt>upr<span class="classifier">float</span></dt><dd><p>upper m/z bound of a region in spectrum without signals</p>
+</dd>
+<dt>dist<span class="classifier">int</span></dt><dd><p>minimum number of datapoints for peak separation</p>
+</dd>
+<dt>loq<span class="classifier">float</span></dt><dd><p>number of times the noise level (k * noise) to define limit of quantification used in peak picking</p>
+</dd>
+<dt>rp_factor<span class="classifier">float</span></dt><dd><p>in method <cite>binning</cite>, factor to scale number of bins; affects mass resolution</p>
+</dd>
+<dt>resolution_progress<span class="classifier">str</span></dt><dd><p>sets resolution for binning if user specifies <cite>yes</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_preprocessing.Preprocess.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">percent_RAM</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_alignment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">align_halfwidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_iter_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">align_reduce</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduce_halfwidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_aligned_peak</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_peak_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_num_peaks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_preprocessing.html#Preprocess.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_preprocessing.Preprocess.run" title="Permalink to this definition"></a></dt>
+<dd><p>imports imzML files and perform peak-picking, mass alignment, and peak integration</p>
+<dl class="simple">
+<dt>percent_RAM<span class="classifier">int, optional</span></dt><dd><p>percent available RAM occupied by chunk, by default 5</p>
+</dd>
+<dt>peak_alignment<span class="classifier">bool, optional</span></dt><dd><p>performs peak alignment if True, by default False</p>
+</dd>
+<dt>align_halfwidth<span class="classifier">int, optional</span></dt><dd><p>_description_, by default 10</p>
+</dd>
+<dt>grid_iter_num<span class="classifier">int, optional</span></dt><dd><p>_description_, by default 100</p>
+</dd>
+<dt>align_reduce<span class="classifier">bool, optional</span></dt><dd><p>reduce intensity matrix involved in peak alignment if True, by default True</p>
+</dd>
+<dt>reduce_halfwidth<span class="classifier">int, optional</span></dt><dd><p>range of intensity bins to be kept specified in half-widths if align_reduce, by default 10</p>
+</dd>
+<dt>plot_aligned_peak<span class="classifier">bool, optional</span></dt><dd><p>render a figure to show peak alignment results if True, by default True</p>
+</dd>
+<dt>index_peak_plot<span class="classifier">int, optional</span></dt><dd><p>peak with specified analyte index to visualize if plot_aligned_peak, by default 0</p>
+</dd>
+<dt>plot_num_peaks<span class="classifier">int, optional</span></dt><dd><p>number of peaks (spectra) to plot if plot_aligned_peak, by default 10</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="data_analysis.html" class="btn btn-neutral float-left" title="data_analysis module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="run.html" class="btn btn-neutral float-right" title="run module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, yutinlin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

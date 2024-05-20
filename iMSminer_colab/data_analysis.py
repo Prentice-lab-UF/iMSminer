@@ -4,6 +4,7 @@
 @author: Haohui Bao (susanab20020911@gmail.com)
 @author: Boone M. Prentice (booneprentice@ufl.chem.edu)
 """
+print("s1")
 import os
 from matplotlib.gridspec import GridSpec
 from matplotlib.colors import ListedColormap, Normalize
@@ -12,9 +13,11 @@ from sklearn.cluster import KMeans
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 from statannotations.Annotator import Annotator
+from shapely.geometry import Point, Polygon
 import math
 import seaborn as sns
 import subprocess
+print("s2")
 from itertools import permutations, combinations
 from statsmodels.formula.api import ols
 import statsmodels.api as sm
@@ -24,9 +27,10 @@ import cv2
 import numpy as np
 import pandas as pd
 import gc
-os.chdir("/home/yutinlin/workspace/iMSminer")
+print("s3")
+os.chdir("/content/drive/My Drive/Colab Notebooks/iMSminer_colab")
 from assorted_functions import make_image_1c, make_image_1c_njit, max_normalize, clustering_in_embedding, plot_image_at_point, gromov_trick, significance, draw_ROI
-
+print("s4")
 # DataAnalysis class
 
 
@@ -92,7 +96,7 @@ class DataAnalysis:
                 fig_ratio_chosen = False
                 print("Select one of the options.")
 
-    def load_preprocessed_data(self):
+    def load_preprocessed_data(self, ROI_select):
         """import preprocessed intensity matrix and coordinate arrays, perform ROI annotation and selection, and store information for further data analysis
 
         Parameters
@@ -106,87 +110,70 @@ class DataAnalysis:
         datasets = os.listdir(self.data_dir)
         datasets = np.asarray(datasets)[(np.char.find(
             datasets, "coords") == -1) & (np.char.find(datasets, "csv") != -1)]
-
+        self.n_datasets = datasets.shape[0]
         df_mean_all = pd.DataFrame()
         self.df_pixel_all = pd.DataFrame()
         ROI_edge = pd.DataFrame()
 
         for rep, dataset in enumerate(datasets):
-            print(f"Importing {dataset}.")
-            df_build = pd.read_csv(f"{self.data_dir}/{dataset}")
-            print(f"Finished importing {dataset}.")
+          print(f"Importing {dataset}.")
+          df_build = pd.read_csv(f"{self.data_dir}/{dataset}")
+          print(f"Finished importing {dataset}.")
+          
+          df_build.rename(columns={'Unnamed: 0': 'mz'}, inplace=True)
+          df_build = df_build.T
 
-            df_build.rename(columns={'Unnamed: 0': 'mz'}, inplace=True)
-            df_build = df_build.T
+          mz = df_build.loc['mz']
+          df_build.drop('mz', inplace=True)
 
-            self.mz = df_build.loc['mz']
-            df_build.drop('mz', inplace=True)
+          df_coords = pd.read_csv(
+              f"{self.data_dir}/{dataset[:-4]}_coords.csv")
+          df_coords.rename(columns={'0': 'x', '1': 'y'}, inplace=True)
+          df_coords['x'] = df_coords['x'] - np.min(df_coords['x']) + 1
+          df_coords['y'] = df_coords['y'] - np.min(df_coords['y']) + 1
 
-            df_coords = pd.read_csv(
-                f"{self.data_dir}/{dataset[:-4]}_coords.csv")
-            df_coords.rename(columns={'0': 'x', '1': 'y'}, inplace=True)
-            df_coords['x'] = df_coords['x'] - np.min(df_coords['x']) + 1
-            df_coords['y'] = df_coords['y'] - np.min(df_coords['y']) + 1
+          df_build.reset_index(drop=True, inplace=True)
+          df_coords.reset_index(drop=True, inplace=True)
 
-            df_build.reset_index(drop=True, inplace=True)
-            df_coords.reset_index(drop=True, inplace=True)
+          df_build = pd.concat([df_build, df_coords[['x', 'y']]], axis=1)
 
-            df_build = pd.concat([df_build, df_coords[['x', 'y']]], axis=1)
+          img_array_1c = make_image_1c(data_2darray=pd.concat([pd.Series(np.sum(
+          df_build.iloc[:, :-2], axis=1)), df_build.iloc[:, -2:]], axis=1).to_numpy())
+        
+          df_build['ROI'] = 'placeholder'
+          df_build['replicate'] = rep
+          # df_build.drop("ROI", axis=1, inplace=True)
 
-            # img_array_1c = make_image_1c(data_2darray = pd.concat([pd.Series(np.ones(df_build.iloc[:,:].shape[0])),df_build.iloc[:,-2:]], axis=1).to_numpy())
-            img_array_1c = make_image_1c(data_2darray=pd.concat([pd.Series(np.sum(
-                df_build.iloc[:, :-2], axis=1)), df_build.iloc[:, -2:]], axis=1).to_numpy())
-            self.img_array_1c = img_array_1c
+          ROI_num = int(input("How many ROIs are you analyzing? "))
+          ROIs = input(
+              "How to name your ROIs, from left to right, top to bottom? Separate ROI names by one space.")
+          ROIs = ROIs.split(" ")
+          
+          for i, ROI in enumerate(ROIs):
+            print(f"Select ROI {i}, labeled {ROI}.")
+            if ROI_num == 1:
+              polygon = Polygon(ROI_select.selected_points[:-1])
+            else:
+              polygon = Polygon(ROI_select.selected_points[i][:-1])
+            ROI_index = [index for index,point in enumerate(df_coords[['x', 'y']].to_numpy()) if polygon.contains(Point(point))]
+            df_build["ROI"][ROI_index] = ROI
+            print(f"ROI {i} is selected and labeled {ROI}!")
 
-            # ["PC_10", "PC_35", "P6_10", "P6_35", "GF_10", "GF_35", "CMC_10", "CMC_35"]
-            self.ROI_num = int(input("How many ROIs are you analyzing? "))
-            ROIs = input(
-                "How to name your ROIs, from left to right, top to bottom? Separate ROI names by one space.")
-            ROIs = ROIs.split(" ")
+            #ROI_info currently does not support bounding box coordinates
+            ROI_edge = pd.concat([ROI_edge, pd.Series(
+              [ROI, rep])], axis=1)
 
-            ROI_exit = False
-            while not ROI_exit:
-                ROI_dim_array = np.empty((0, 4))
-                for ROI in ROIs:
-                    # ROI_dim = cv2.selectROI('ROI_selection', img_array_1c[0], showCrosshair=True)
-                    ROI_select = bbox_select(img_array_1c[0])
-                    ROI_select.disconnect_event.wait()
-                    # ROI_dim = np.asarray(ROI_select.selected_points)
-                    # ROI_dim_array = np.append(ROI_dim_array, ROI_dim.reshape((1,-1)), axis=0)
-               # cv2.destroyAllWindows()
-                ROI_sele = input("Keep ROI selecction? (yes/no) ")
-                if ROI_sele == "yes":
-                    ROI_exit = True
-                else:
-                    ROI_exit = False
+          self.df_pixel_all = pd.concat([self.df_pixel_all, df_build])
+          
 
-            df_build['ROI'] = 'placeholder'
-            df_build['replicate'] = rep
-            # df_build.drop("ROI", axis=1, inplace=True)
-
-            for i, ROI in enumerate(ROIs):
-                print(f"Select ROI {i}, labeled {ROI}.")
-                bottom = ROI_dim_array[i][1]
-                top = ROI_dim_array[i][1] + ROI_dim_array[i][3]
-                left = ROI_dim_array[i][0]
-                right = ROI_dim_array[i][0] + ROI_dim_array[i][2]
-
-                ROI_xy = (df_build['x'] >= left) & (df_build['x'] < right) & (
-                    df_build['y'] >= bottom) & (df_build['y'] < top)
-                df_build["ROI"][ROI_xy] = ROI
-                print(f"ROI {i} is selected and labeled {ROI}!")
-
-                ROI_edge = pd.concat([ROI_edge, pd.Series(
-                    [ROI, bottom, top, left, right, rep])], axis=1)
-
-            self.df_pixel_all = pd.concat([self.df_pixel_all, df_build])
 
         self.df_pixel_all.reset_index(drop=True, inplace=True)
         self.df_pixel_all.columns = self.df_pixel_all.columns.astype(str)
         ROI_edge = ROI_edge.T.reset_index(drop=True)
-        ROI_edge.columns = ["ROI", "bottom",
-                            "top", "left", "right", "replicate"]
+        ROI_edge.columns = ["ROI", "replicate"]
         self.ROI_info = ROI_edge
+
+        # self.ROI_info = ROI_edge
 
     def calibrate_mz(self):
         """Interactive calibration using polynomial regression via linear model of user-specified degree
@@ -421,8 +408,8 @@ class DataAnalysis:
                 self.df_pixel_all[['x', 'y']]).max()/25], wspace=0.05)
             ax1 = fig.add_subplot(gs[0])
             im_plot = ax1.imshow(im, cmap=color_scheme)
-            draw_ROI(ROI_info, show_ROI=show_ROI,
-                     show_square=show_square, linewidth=3)
+            # draw_ROI(ROI_info, show_ROI=show_ROI,
+            #          show_square=show_square, linewidth=3) #not supported in iMSminer beta
             plt.xticks([])
             plt.yticks([])
             plt.title(f"m/z {self.mz[analyte]:.3f}")
@@ -882,53 +869,54 @@ class DataAnalysis:
         plt.savefig(f"{self.data_dir}/figures/image_cluster/image_insitu_tsne")
 
         # cluster boxplot
-        image_cluster_df_long = pd.melt(cluster_mean_df, id_vars=[
-                                        'ROI'], var_name='cluster', value_name='intensity')
-        image_cluster_df_long['intensity'] = image_cluster_df_long['intensity'].div(
-            image_cluster_df_long.groupby(['cluster']).transform('max')['intensity'])
+        if self.n_datasets >= 3:
+          image_cluster_df_long = pd.melt(cluster_mean_df, id_vars=[
+                                          'ROI'], var_name='cluster', value_name='intensity')
+          image_cluster_df_long['intensity'] = image_cluster_df_long['intensity'].div(
+              image_cluster_df_long.groupby(['cluster']).transform('max')['intensity'])
 
-        ROI = image_cluster_df_long["ROI"]
-        for cluster in image_cluster_df_long['cluster'].unique():
-            image_cluster_df_cluster = image_cluster_df_long[image_cluster_df_long['cluster'] == cluster]
-            pvalue = [
-                sm.stats.anova_lm(
-                    ols('intensity ~ C(ROI)', data=image_cluster_df_cluster.loc[
-                        (image_cluster_df_cluster['ROI'] == combo[0]) |
-                        (image_cluster_df_cluster['ROI'] == combo[1]),
-                        ['ROI', 'intensity']]
-                        ).fit(),
-                    typ=1
-                )['PR(>F)'][0]
+          ROI = image_cluster_df_long["ROI"]
+          for cluster in image_cluster_df_long['cluster'].unique():
+              image_cluster_df_cluster = image_cluster_df_long[image_cluster_df_long['cluster'] == cluster]
+              pvalue = [
+                  sm.stats.anova_lm(
+                      ols('intensity ~ C(ROI)', data=image_cluster_df_cluster.loc[
+                          (image_cluster_df_cluster['ROI'] == combo[0]) |
+                          (image_cluster_df_cluster['ROI'] == combo[1]),
+                          ['ROI', 'intensity']]
+                          ).fit(),
+                      typ=1
+                  )['PR(>F)'][0]
 
-                for combo in list(combinations(ROI.unique(), 2))
-            ]
-            model_pairs = [
-                combo
-                for combo in list(combinations(ROI.unique(), 2))
-            ]
+                  for combo in list(combinations(ROI.unique(), 2))
+              ]
+              model_pairs = [
+                  combo
+                  for combo in list(combinations(ROI.unique(), 2))
+              ]
 
-            fig = plt.figure(figsize=(
-                (10+math.comb(self.ROI_num, 2)/10)/2, (7+math.comb(self.ROI_num, 2)/3)/2))
-            plt.rcParams.update(
-                {'font.size': (10+math.comb(self.ROI_num, 2)/10)})
-            ax = fig.add_subplot()
-            sns.boxplot(x="ROI", y="intensity",
-                        data=image_cluster_df_cluster, color='white')
-            sns.stripplot(x="ROI", y="intensity", data=image_cluster_df_cluster,
-                          color='red', size=4, jitter=True)
+              fig = plt.figure(figsize=(
+                  (10+math.comb(self.ROI_num, 2)/10)/2, (7+math.comb(self.ROI_num, 2)/3)/2))
+              plt.rcParams.update(
+                  {'font.size': (10+math.comb(self.ROI_num, 2)/10)})
+              ax = fig.add_subplot()
+              sns.boxplot(x="ROI", y="intensity",
+                          data=image_cluster_df_cluster, color='white')
+              sns.stripplot(x="ROI", y="intensity", data=image_cluster_df_cluster,
+                            color='red', size=4, jitter=True)
 
-            annotator = Annotator(ax, model_pairs, x="ROI",
-                                  y="intensity", data=image_cluster_df_cluster)
-            formatted_pvalues = [f'{significance(p)}' for p in pvalue]
-            annotator.set_custom_annotations(formatted_pvalues)
-            annotator.annotate()
+              annotator = Annotator(ax, model_pairs, x="ROI",
+                                    y="intensity", data=image_cluster_df_cluster)
+              formatted_pvalues = [f'{significance(p)}' for p in pvalue]
+              annotator.set_custom_annotations(formatted_pvalues)
+              annotator.annotate()
 
-            plt.title(f'Mean image of cluster {cluster}')
-            plt.xlabel('ROI')
-            plt.ylabel('Mean Intensity')
-            plt.tight_layout()
-            plt.savefig(
-                f"{self.data_dir}/figures/image_cluster/boxplot_cluster{cluster}.jpg", dpi=200)
+              plt.title(f'Mean image of cluster {cluster}')
+              plt.xlabel('ROI')
+              plt.ylabel('Mean Intensity')
+              plt.tight_layout()
+              plt.savefig(
+                  f"{self.data_dir}/figures/image_cluster/boxplot_cluster{cluster}.jpg", dpi=200)
 
         image_cluster_all = image_cluster_all.drop(columns=["ROI"])
         if self.jit:
@@ -953,8 +941,8 @@ class DataAnalysis:
                 self.df_pixel_all[['x', 'y']]).max()/25], wspace=0.05)
             ax1 = fig.add_subplot(gs[0])
             im_plot = ax1.imshow(im, cmap=color_scheme)
-            draw_ROI(ROI_info, show_ROI=show_ROI,
-                     show_square=show_square, linewidth=3)
+            # draw_ROI(ROI_info, show_ROI=show_ROI,
+            #          show_square=show_square, linewidth=3) #not supported in iMSminer beta
             plt.xticks([])
             plt.yticks([])
             plt.title(f"Mean image of cluster {analyte+1}")

@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>assorted_functions module &mdash; iMSminer_beta 0.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+      <link rel="stylesheet" href="_static/fonts.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="data_analysis module" href="data_analysis.html" />
+    <link rel="prev" title="iMSminer" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            iMSminer_beta
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">iMSminer</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">assorted_functions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_analysis.html">data_analysis module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_preprocessing.html">data_preprocessing module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="run.html">run module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">iMSminer_beta</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">iMSminer</a></li>
+      <li class="breadcrumb-item active">assorted_functions module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/assorted_functions.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-assorted_functions">
+<span id="assorted-functions-module"></span><h1>assorted_functions module<a class="headerlink" href="#module-assorted_functions" title="Permalink to this heading"></a></h1>
+<p>&#64;author: Yu Tin Lin (<a class="reference external" href="mailto:yutinlin&#37;&#52;&#48;stanford&#46;edu">yutinlin<span>&#64;</span>stanford<span>&#46;</span>edu</a>)
+&#64;author: Haohui Bao (<a class="reference external" href="mailto:susanab20020911&#37;&#52;&#48;gmail&#46;com">susanab20020911<span>&#64;</span>gmail<span>&#46;</span>com</a>)
+&#64;author: Boone M. Prentice (<a class="reference external" href="mailto:booneprentice&#37;&#52;&#48;ufl&#46;chem&#46;edu">booneprentice<span>&#64;</span>ufl<span>&#46;</span>chem<span>&#46;</span>edu</a>)</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="assorted_functions.Aligner_CPU">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">assorted_functions.</span></span><span class="sig-name descname"><span class="pre">Aligner_CPU</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peaks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'cubic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_shifts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">align_by_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_shift</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#Aligner_CPU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.Aligner_CPU" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Alignment class from <a class="reference external" href="https://github.com/lukasz-migas/msalign">https://github.com/lukasz-migas/msalign</a></p>
+<blockquote>
+<div><p>&#64;software{msalign2024,
+author = {Lukasz G. Migas},
+title = {{msalign}: Spectral alignment based on MATLAB’s <cite>msalign</cite> function.},
+url = {<a class="reference external" href="https://github.com/lukasz-migas/msalign">https://github.com/lukasz-migas/msalign</a>},
+version = {0.2.0},
+year = {2024},
+}</p>
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="assorted_functions.Aligner_CPU.align">
+<span class="sig-name descname"><span class="pre">align</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shift_opt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_opt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#Aligner_CPU.align"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.Aligner_CPU.align" title="Permalink to this definition"></a></dt>
+<dd><p>Realign array based on the optimized shift and scale parameters</p>
+<dl class="simple">
+<dt>shift_opt: Optional[np.ndarray]</dt><dd><p>vector containing values by which to shift the array</p>
+</dd>
+<dt>scale_opt<span class="classifier">Optional[np.ndarray]</span></dt><dd><p>vector containing values by which to rescale the array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="assorted_functions.Aligner_CPU.apply">
+<span class="sig-name descname"><span class="pre">apply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_shifts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#Aligner_CPU.apply"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.Aligner_CPU.apply" title="Permalink to this definition"></a></dt>
+<dd><p>Align the signals against the computed values</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="assorted_functions.Aligner_CPU.compute">
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/assorted_functions.html#Aligner_CPU.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.Aligner_CPU.compute" title="Permalink to this definition"></a></dt>
+<dd><p>Compute correction factors.</p>
+<p>This function does not set value in any of the class attributes so can be used in a iterator where values
+are computed lazily.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="assorted_functions.Aligner_CPU.gaussian_ratio">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">gaussian_ratio</span></span><a class="headerlink" href="#assorted_functions.Aligner_CPU.gaussian_ratio" title="Permalink to this definition"></a></dt>
+<dd><p>Gaussian ratio.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="assorted_functions.Aligner_CPU.gaussian_resolution">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">gaussian_resolution</span></span><a class="headerlink" href="#assorted_functions.Aligner_CPU.gaussian_resolution" title="Permalink to this definition"></a></dt>
+<dd><p>Gaussian resolution of every Gaussian pulse (number of points).</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="assorted_functions.Aligner_CPU.gaussian_width">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">gaussian_width</span></span><a class="headerlink" href="#assorted_functions.Aligner_CPU.gaussian_width" title="Permalink to this definition"></a></dt>
+<dd><p>Width of the Gaussian pulse in std dev of the Gaussian pulses (in X).</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="assorted_functions.Aligner_CPU.grid_steps">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">grid_steps</span></span><a class="headerlink" href="#assorted_functions.Aligner_CPU.grid_steps" title="Permalink to this definition"></a></dt>
+<dd><p>Total number of iterations - increase to improve accuracy.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="assorted_functions.Aligner_CPU.method">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">method</span></span><a class="headerlink" href="#assorted_functions.Aligner_CPU.method" title="Permalink to this definition"></a></dt>
+<dd><p>Interpolation method.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="assorted_functions.Aligner_CPU.n_iterations">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_iterations</span></span><a class="headerlink" href="#assorted_functions.Aligner_CPU.n_iterations" title="Permalink to this definition"></a></dt>
+<dd><p>Total number of iterations - increase to improve accuracy.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="assorted_functions.Aligner_CPU.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#Aligner_CPU.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.Aligner_CPU.run" title="Permalink to this definition"></a></dt>
+<dd><p>Execute the alignment procedure for each signal in the 2D array and collate the shift/scale vectors</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="assorted_functions.Aligner_CPU.shift">
+<span class="sig-name descname"><span class="pre">shift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shift_opt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#Aligner_CPU.shift"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.Aligner_CPU.shift" title="Permalink to this definition"></a></dt>
+<dd><p>Quickly shift array based on the optimized shift parameters.</p>
+<p>This method does not interpolate but rather moves the data left and right without applying any scaling.</p>
+<dl class="simple">
+<dt>shift_opt: Optional[np.ndarray]</dt><dd><p>vector containing values by which to shift the array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="assorted_functions.Aligner_CPU.shift_range">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shift_range</span></span><a class="headerlink" href="#assorted_functions.Aligner_CPU.shift_range" title="Permalink to this definition"></a></dt>
+<dd><p>Total number of iterations - increase to improve accuracy.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="assorted_functions.Aligner_CPU.weights">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">weights</span></span><a class="headerlink" href="#assorted_functions.Aligner_CPU.weights" title="Permalink to this definition"></a></dt>
+<dd><p>Total number of iterations - increase to improve accuracy.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="assorted_functions.Aligner_GPU">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">assorted_functions.</span></span><span class="sig-name descname"><span class="pre">Aligner_GPU</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peaks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gpu_linear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_shifts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_shift</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">align_by_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#Aligner_GPU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.Aligner_GPU" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Alignment class refactored from <a class="reference external" href="https://github.com/lukasz-migas/msalign">https://github.com/lukasz-migas/msalign</a></p>
+<dl class="simple">
+<dt>Cite the following if used:</dt><dd><p>&#64;software{msalign2024,
+author = {Lukasz G. Migas},
+title = {{msalign}: Spectral alignment based on MATLAB’s <cite>msalign</cite> function.},
+url = {<a class="reference external" href="https://github.com/lukasz-migas/msalign">https://github.com/lukasz-migas/msalign</a>},
+version = {0.2.0},
+year = {2024},
+}</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="assorted_functions.Aligner_GPU.align">
+<span class="sig-name descname"><span class="pre">align</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shift_opt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_opt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#Aligner_GPU.align"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.Aligner_GPU.align" title="Permalink to this definition"></a></dt>
+<dd><p>Realign array based on the optimized shift and scale parameters</p>
+<dl class="simple">
+<dt>shift_opt: Optional[np.ndarray]</dt><dd><p>vector containing values by which to shift the array</p>
+</dd>
+<dt>scale_opt<span class="classifier">Optional[np.ndarray]</span></dt><dd><p>vector containing values by which to rescale the array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="assorted_functions.Aligner_GPU.apply">
+<span class="sig-name descname"><span class="pre">apply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">return_shifts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#Aligner_GPU.apply"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.Aligner_GPU.apply" title="Permalink to this definition"></a></dt>
+<dd><p>Align the signals against the computed values</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="assorted_functions.Aligner_GPU.compute">
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/assorted_functions.html#Aligner_GPU.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.Aligner_GPU.compute" title="Permalink to this definition"></a></dt>
+<dd><p>Compute correction factors.</p>
+<p>This function does not set value in any of the class attributes so can be used in a iterator where values
+are computed lazily.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="assorted_functions.Aligner_GPU.compute_batch">
+<span class="sig-name descname"><span class="pre">compute_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/assorted_functions.html#Aligner_GPU.compute_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.Aligner_GPU.compute_batch" title="Permalink to this definition"></a></dt>
+<dd><p>Compute correction factors for a batch of signals.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Y</strong> – 2D CuPy array where each row is a signal.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Two 1D CuPy arrays containing the shift and scale optimizations for each signal.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="assorted_functions.Aligner_GPU.grid_steps">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">grid_steps</span></span><a class="headerlink" href="#assorted_functions.Aligner_GPU.grid_steps" title="Permalink to this definition"></a></dt>
+<dd><p>Total number of iterations - increase to improve accuracy.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="assorted_functions.Aligner_GPU.method">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">method</span></span><a class="headerlink" href="#assorted_functions.Aligner_GPU.method" title="Permalink to this definition"></a></dt>
+<dd><p>Interpolation method.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="assorted_functions.Aligner_GPU.n_iterations">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_iterations</span></span><a class="headerlink" href="#assorted_functions.Aligner_GPU.n_iterations" title="Permalink to this definition"></a></dt>
+<dd><p>Total number of iterations - increase to improve accuracy.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="assorted_functions.Aligner_GPU.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#Aligner_GPU.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.Aligner_GPU.run" title="Permalink to this definition"></a></dt>
+<dd><p>Execute the alignment procedure for each signal in the 2D array and collate the shift/scale vectors</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="assorted_functions.Aligner_GPU.run_batch">
+<span class="sig-name descname"><span class="pre">run_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#Aligner_GPU.run_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.Aligner_GPU.run_batch" title="Permalink to this definition"></a></dt>
+<dd><p>Execute the alignment procedure for the entire batch of signals and collate the shift/scale vectors.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="assorted_functions.Aligner_GPU.shift">
+<span class="sig-name descname"><span class="pre">shift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shift_opt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#Aligner_GPU.shift"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.Aligner_GPU.shift" title="Permalink to this definition"></a></dt>
+<dd><p>Quickly shift array based on the optimized shift parameters.</p>
+<p>This method does not interpolate but rather moves the data left and right without applying any scaling.</p>
+<dl class="simple">
+<dt>shift_opt: Optional[np.ndarray]</dt><dd><p>vector containing values by which to shift the array</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="assorted_functions.bbox_select">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">assorted_functions.</span></span><span class="sig-name descname"><span class="pre">bbox_select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">im</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#bbox_select"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.bbox_select" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="assorted_functions.bbox_select.disconnect_mpl">
+<span class="sig-name descname"><span class="pre">disconnect_mpl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#bbox_select.disconnect_mpl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.bbox_select.disconnect_mpl" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="assorted_functions.bbox_select.onclick">
+<span class="sig-name descname"><span class="pre">onclick</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#bbox_select.onclick"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.bbox_select.onclick" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="assorted_functions.bbox_select.poly_img">
+<span class="sig-name descname"><span class="pre">poly_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#bbox_select.poly_img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.bbox_select.poly_img" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="assorted_functions.build_effnet">
+<span class="sig-prename descclassname"><span class="pre">assorted_functions.</span></span><span class="sig-name descname"><span class="pre">build_effnet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#build_effnet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.build_effnet" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>inputs:</dt><dd><p>image_array: RGB images from make_image()</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>outputs:</dt><dd><p>EfficientNetV2L feature extractor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="assorted_functions.chunk_prep">
+<span class="sig-prename descclassname"><span class="pre">assorted_functions.</span></span><span class="sig-name descname"><span class="pre">chunk_prep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percent_RAM</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#chunk_prep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.chunk_prep" title="Permalink to this definition"></a></dt>
+<dd><p>Prepares parameters used in chunking. Imports imzML datasets using pyimzml.ImzMLParser (<a class="reference external" href="https://github.com/alexandrovteam/pyimzML">https://github.com/alexandrovteam/pyimzML</a>)</p>
+<dl class="simple">
+<dt>p<span class="classifier">pyimzml.ImzMLParser</span></dt><dd><p>The data to process, converted to ImzMLParser from the .imzML raw date file.</p>
+</dd>
+<dt>min_mz<span class="classifier">float</span></dt><dd><p>minimum m/z in inhomogeneous dataset</p>
+</dd>
+<dt>max_mz<span class="classifier">float</span></dt><dd><p>maximum m/z in inhomogeneous dataset</p>
+</dd>
+<dt>mz_RP<span class="classifier">float</span></dt><dd><p>m/z in which resolving power (FWHM) is calculated</p>
+</dd>
+<dt>RP<span class="classifier">float</span></dt><dd><p>resolving power (FWHM) at m/z {mz_RP}</p>
+</dd>
+<dt>dist<span class="classifier">int</span></dt><dd><p>minimum number of datapoints for peak separation</p>
+</dd>
+<dt>percent_RAM<span class="classifier">int, optional</span></dt><dd><p>percent available RAM occupied by chunk, by default 5</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>num_chunks: int</dt><dd><p>Number of chunks the data needs to be devided into to optimize the use of
+avilable RAM on the computer.</p>
+</dd>
+<dt>chunk_size_base: int</dt><dd><p>The minimal number of columns in each chunk.</p>
+</dd>
+<dt>chunk_start: int</dt><dd><p>The row index location of where the first chunck starts in the .</p>
+</dd>
+<dt>remainder: int</dt><dd><p>The remaining columns of data after assigning each chunk a minimal number of columns.</p>
+</dd>
+</dl>
+<p>&#64;software{msalign2024,
+author = {Fay, D.; Palmer, A. D.; Vitaly, K.; Alexandrov, T},
+title = {{pyimzML}:A parser for the imzML format used in imaging mass spectrometry.},
+url = {<a class="reference external" href="https://github.com/alexandrovteam/pyimzML">https://github.com/alexandrovteam/pyimzML</a>},
+}</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="assorted_functions.chunk_prep_inhomogeneous">
+<span class="sig-prename descclassname"><span class="pre">assorted_functions.</span></span><span class="sig-name descname"><span class="pre">chunk_prep_inhomogeneous</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_mz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_mz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mz_RP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">RP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percent_RAM</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#chunk_prep_inhomogeneous"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.chunk_prep_inhomogeneous" title="Permalink to this definition"></a></dt>
+<dd><p>Prepares parameters used in chunking for imzML datasets of inhomogeneous shapes. Imports imzML datasets using pyimzml.ImzMLParser (<a class="reference external" href="https://github.com/alexandrovteam/pyimzML">https://github.com/alexandrovteam/pyimzML</a>)</p>
+<dl class="simple">
+<dt>p<span class="classifier">pyimzml.ImzMLParser</span></dt><dd><p>The data to process, converted to ImzMLParser from the .imzML raw date file.</p>
+</dd>
+<dt>min_mz<span class="classifier">float</span></dt><dd><p>minimum m/z in inhomogeneous dataset</p>
+</dd>
+<dt>max_mz<span class="classifier">float</span></dt><dd><p>maximum m/z in inhomogeneous dataset</p>
+</dd>
+<dt>mz_RP<span class="classifier">float</span></dt><dd><p>m/z in which resolving power (FWHM) is calculated</p>
+</dd>
+<dt>RP<span class="classifier">float</span></dt><dd><p>resolving power (FWHM) at m/z {mz_RP}</p>
+</dd>
+<dt>dist<span class="classifier">int</span></dt><dd><p>minimum number of datapoints for peak separation</p>
+</dd>
+<dt>percent_RAM<span class="classifier">int, optional</span></dt><dd><p>percent available RAM occupied by chunk, by default 5</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>num_chunks: int</dt><dd><p>Number of chunks the data needs to be devided into to optimize the use of
+avilable RAM on the computer.</p>
+</dd>
+<dt>chunk_size_base: int</dt><dd><p>The minimal number of columns in each chunk.</p>
+</dd>
+<dt>chunk_start: int</dt><dd><p>The row index location of where the first chunck starts in the .</p>
+</dd>
+<dt>remainder: int</dt><dd><p>The remaining columns of data after assigning each chunk a minimal number of columns.</p>
+</dd>
+</dl>
+<p>&#64;software{msalign2024,
+author = {Fay, D.; Palmer, A. D.; Vitaly, K.; Alexandrov, T},
+title = {{pyimzML}: A parser for the imzML format used in imaging mass spectrometry.},
+url = {<a class="reference external" href="https://github.com/alexandrovteam/pyimzML">https://github.com/alexandrovteam/pyimzML</a>},
+}</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="assorted_functions.clustering_in_embedding">
+<span class="sig-prename descclassname"><span class="pre">assorted_functions.</span></span><span class="sig-name descname"><span class="pre">clustering_in_embedding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#clustering_in_embedding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.clustering_in_embedding" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>inputs:</dt><dd><p>image_array: normalized images from gromov_trick() or extracted features from transfer learning or img_array_1c from make_image()</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>outputs:</dt><dd><p>k-means labels and t-SNE embedding of image_array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="assorted_functions.draw_ROI">
+<span class="sig-prename descclassname"><span class="pre">assorted_functions.</span></span><span class="sig-name descname"><span class="pre">draw_ROI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ROI_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_ROI</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_square</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linewidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#draw_ROI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.draw_ROI" title="Permalink to this definition"></a></dt>
+<dd><p>Visualize selected ROI region in a green box</p>
+<dl class="simple">
+<dt>ROI_info<span class="classifier">pd.dataframe</span></dt><dd><p>Replicate, ROI annotations, x,y coordinates from ROI selection</p>
+</dd>
+<dt>show_ROI<span class="classifier">bool, optional</span></dt><dd><p>Displays ROI labels if True, by default True</p>
+</dd>
+<dt>show_square<span class="classifier">bool, optional</span></dt><dd><p>Displays green box around selected ROI if True , by default False</p>
+</dd>
+<dt>linewidth<span class="classifier">float, optional</span></dt><dd><p>Width of green box, by default 3</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="assorted_functions.get_chunk_ms_info">
+<span class="sig-prename descclassname"><span class="pre">assorted_functions.</span></span><span class="sig-name descname"><span class="pre">get_chunk_ms_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#get_chunk_ms_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.get_chunk_ms_info" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a dictionary of intensity, m/z, and coordinate values by iterating through a chunk of imzML data</p>
+<dl class="simple">
+<dt>p: pyimzml.ImzMLParser</dt><dd><p>Instace of ImzMLParser class containing imported imzML data</p>
+</dd>
+<dt>chunk_start: int</dt><dd><p>Pixel index for the start of chunk</p>
+</dd>
+<dt>chunk_size: int</dt><dd><p>Number of pixels contained in each chunk</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>ms_dict: dictionary of 2 key:value pairs</dt><dd><p>Key <cite>I</cite> contains the intensity matrix of axes pixel index and m/z bin index
+Key <cite>mz</cite> contains m/z values
+Key <cite>coords</cite> contains pixel indices and coordinate values</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="assorted_functions.get_chunk_ms_info2">
+<span class="sig-prename descclassname"><span class="pre">assorted_functions.</span></span><span class="sig-name descname"><span class="pre">get_chunk_ms_info2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#get_chunk_ms_info2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.get_chunk_ms_info2" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a dictionary of intensity, m/z, and coordinate values from a chunk of imzML data</p>
+<dl class="simple">
+<dt>p: pyimzml.ImzMLParser</dt><dd><p>Instace of ImzMLParser class containing imported imzML data</p>
+</dd>
+<dt>chunk_start: int</dt><dd><p>Pixel index for the start of chunk</p>
+</dd>
+<dt>chunk_size: int</dt><dd><p>Number of pixels contained in each chunk</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>ms_dict: dictionary of 2 key:value pairs</dt><dd><p>Key <cite>I</cite> contains the intensity matrix of axes pixel index and m/z bin index
+Key <cite>mz</cite> contains m/z values
+Key <cite>coords</cite> contains pixel indices and coordinate values</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="assorted_functions.get_chunk_ms_info_inhomogeneous">
+<span class="sig-prename descclassname"><span class="pre">assorted_functions.</span></span><span class="sig-name descname"><span class="pre">get_chunk_ms_info_inhomogeneous</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_mz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_mz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mz_RP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">RP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rp_factor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#get_chunk_ms_info_inhomogeneous"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.get_chunk_ms_info_inhomogeneous" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a dictionary of intensity, m/z, and coordinate values from a chunk of imzML data of inhomogeneous shapes</p>
+<dl class="simple">
+<dt>p: pyimzml.ImzMLParser</dt><dd><p>Instace of ImzMLParser class containing imported imzML data</p>
+</dd>
+<dt>chunk_start: int</dt><dd><p>Pixel index for the start of chunk</p>
+</dd>
+<dt>chunk_size: int</dt><dd><p>Number of pixels contained in each chunk</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>ms_dict: dictionary of 2 key:value pairs</dt><dd><p>Key <cite>I</cite> contains the intensity matrix of axes pixel index and m/z bin index
+Key <cite>mz</cite> contains m/z values
+Key <cite>coords</cite> contains pixel indices and coordinate values</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="assorted_functions.get_p2">
+<span class="sig-prename descclassname"><span class="pre">assorted_functions.</span></span><span class="sig-name descname"><span class="pre">get_p2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lwr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rel_height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_size_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_chunks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remainder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'point'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#get_p2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.get_p2" title="Permalink to this definition"></a></dt>
+<dd><p>_summary_</p>
+<dl class="simple">
+<dt>p<span class="classifier">pyimzml.ImzMLParser</span></dt><dd><p>The data to process, converted to ImzMLParser from the .imzML raw date file.</p>
+</dd>
+<dt>loq<span class="classifier">float</span></dt><dd><p>number of times the noise level (k * noise) to define limit of quantification used in peak picking</p>
+</dd>
+<dt>lwr<span class="classifier">float</span></dt><dd><p>lower m/z bound of a region in spectrum without signals</p>
+</dd>
+<dt>upr<span class="classifier">float</span></dt><dd><p>upper m/z bound of a region in spectrum without signals</p>
+</dd>
+<dt>rel_height<span class="classifier">float, optional</span></dt><dd><p>peak height cutoff for peak integration, by default 0.9</p>
+</dd>
+<dt>chunk_size_base<span class="classifier">_type_</span></dt><dd><p>_description_</p>
+</dd>
+<dt>num_chunks<span class="classifier">_type_</span></dt><dd><p>_description_</p>
+</dd>
+<dt>chunk_start<span class="classifier">_type_</span></dt><dd><p>_description_</p>
+</dd>
+<dt>remainder<span class="classifier">_type_</span></dt><dd><p>_description_</p>
+</dd>
+<dt>dist<span class="classifier">int</span></dt><dd><p>minimum number of datapoints for peak separation</p>
+</dd>
+<dt>noise<span class="classifier">int, optional</span></dt><dd><p>_description_, by default 0</p>
+</dd>
+<dt>method<span class="classifier">str, optional</span></dt><dd><p>_description_, by default “point”</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>_type_</dt><dd><p>_description_</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="assorted_functions.get_spectrum">
+<span class="sig-prename descclassname"><span class="pre">assorted_functions.</span></span><span class="sig-name descname"><span class="pre">get_spectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mzs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avg_intensity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#get_spectrum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.get_spectrum" title="Permalink to this definition"></a></dt>
+<dd><p>Generate interactive mean spectrum and stores at output_filepath</p>
+<dl class="simple">
+<dt>output_filepath<span class="classifier">str</span></dt><dd><p>file path to store spectrum</p>
+</dd>
+<dt>mzs<span class="classifier">np.1darray</span></dt><dd><p>m/z values from get_p2</p>
+</dd>
+<dt>avg_intensity<span class="classifier">np.1darray</span></dt><dd><p>mean spectrum from get_p2</p>
+</dd>
+<dt>p2<span class="classifier">np.1darray</span></dt><dd><p>m/z bin indices corresponding to peak-picked maxima</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="assorted_functions.gromov_trick">
+<span class="sig-prename descclassname"><span class="pre">assorted_functions.</span></span><span class="sig-name descname"><span class="pre">gromov_trick</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#gromov_trick"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.gromov_trick" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>inputs:</dt><dd><p>image_array: extracted features from transfer learning or img_array_1c from make_image()</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>outputs:</dt><dd><p>normalized image_array for k-means clustering</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="assorted_functions.integrate_peak">
+<span class="sig-prename descclassname"><span class="pre">assorted_functions.</span></span><span class="sig-name descname"><span class="pre">integrate_peak</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chunk_ms_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_0_mz_peaks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'peak_width'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_duplicates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#integrate_peak"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.integrate_peak" title="Permalink to this definition"></a></dt>
+<dd><p>Peak integration based on p2_width over chunk_ns_dict</p>
+<dl class="simple">
+<dt>chunk_ms_dict<span class="classifier">dict</span></dt><dd><p>Chunking output from get_chunk_ms_info()</p>
+</dd>
+<dt>p2<span class="classifier">array of int</span></dt><dd><p>Peak indices from peak picking</p>
+</dd>
+<dt>p2_width<span class="classifier">array of float</span></dt><dd><p>Peak regions computed by np.peak_widths</p>
+</dd>
+<dt>chunk_0_mz_peaks<span class="classifier">array of float</span></dt><dd><p>m/z values mapped by p2</p>
+</dd>
+<dt>method<span class="classifier">str</span></dt><dd><p>Peak integration method. Peak_width is currently the only supported option,</p>
+</dd>
+<dt>remove_duplicates<span class="classifier">bool, optional</span></dt><dd><p>Removes duplicates of peak regions in cases of near-isobars unresolved at user-specified rel_height in peak_pick(), by default False</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>pd.DataFrame</dt><dd><p>Integrated intensity matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="assorted_functions.make_image">
+<span class="sig-prename descclassname"><span class="pre">assorted_functions.</span></span><span class="sig-name descname"><span class="pre">make_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#make_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.make_image" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>inputs:</dt><dd><p>matrix: intensity matrix of molecular images as vectors in axis 0
+x: remapped x-coordinates
+y: remapped y-coordinates</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>outputs:</dt><dd><p>RGB-transformed and grayscale images</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="assorted_functions.make_image_1c">
+<span class="sig-prename descclassname"><span class="pre">assorted_functions.</span></span><span class="sig-name descname"><span class="pre">make_image_1c</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_2darray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remap_coord</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#make_image_1c"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.make_image_1c" title="Permalink to this definition"></a></dt>
+<dd><p>Map pixel-indexed intensity values to x,y-coordinate values. Just-in-time compiler implementation</p>
+<dl class="simple">
+<dt>data_2darray<span class="classifier">np.2darray</span></dt><dd><p>2darray converted from intensity matrix</p>
+</dd>
+<dt>img_array_1c<span class="classifier">np.3darray</span></dt><dd><p>empty 3darray to store x,y-mapped ion images</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>np.3darray</dt><dd><p>RGB-transformed and grayscale images</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="assorted_functions.make_image_1c_njit">
+<span class="sig-prename descclassname"><span class="pre">assorted_functions.</span></span><span class="sig-name descname"><span class="pre">make_image_1c_njit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_2darray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_array_1c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remap_coord</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#make_image_1c_njit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.make_image_1c_njit" title="Permalink to this definition"></a></dt>
+<dd><p>Map pixel-indexed intensity values to x,y-coordinate values. Just-in-time compiler implementation</p>
+<dl class="simple">
+<dt>data_2darray<span class="classifier">np.2darray</span></dt><dd><p>2darray converted from intensity matrix</p>
+</dd>
+<dt>img_array_1c<span class="classifier">np.3darray</span></dt><dd><p>empty 3darray to store x,y-mapped ion images</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>np.3darray</dt><dd><p>RGB-transformed and grayscale images</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="assorted_functions.max_normalize">
+<span class="sig-prename descclassname"><span class="pre">assorted_functions.</span></span><span class="sig-name descname"><span class="pre">max_normalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_2darray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#max_normalize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.max_normalize" title="Permalink to this definition"></a></dt>
+<dd><p>Normalize on maximum value of each pixel</p>
+<dl class="simple">
+<dt>data_2darray<span class="classifier">np.2darray</span></dt><dd><p>2darray converted from intensity matrix extracted from imzML dataset</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>np.2darray</dt><dd><p>max-normalized 2darray from intensity matrix extracted from imzML dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="assorted_functions.peak_integration">
+<span class="sig-prename descclassname"><span class="pre">assorted_functions.</span></span><span class="sig-name descname"><span class="pre">peak_integration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intensity_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deviation_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MZ</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2_new</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_area_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_0_mz</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#peak_integration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.peak_integration" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="assorted_functions.plot_image_at_point">
+<span class="sig-prename descclassname"><span class="pre">assorted_functions.</span></span><span class="sig-name descname"><span class="pre">plot_image_at_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">im</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zoom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_scheme</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'inferno'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#plot_image_at_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.plot_image_at_point" title="Permalink to this definition"></a></dt>
+<dd><p>Plots a tiny image at point xy for visualization with dimensionally reduced embedding.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="assorted_functions.remapping_coords">
+<span class="sig-prename descclassname"><span class="pre">assorted_functions.</span></span><span class="sig-name descname"><span class="pre">remapping_coords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#remapping_coords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.remapping_coords" title="Permalink to this definition"></a></dt>
+<dd><p>Remap x,y coordinate values on arbitrary scale to minima (0, 0) with steps of 1</p>
+<dl class="simple">
+<dt>x<span class="classifier">np.1darray</span></dt><dd><p>x coordinate values imported from imzML dataset</p>
+</dd>
+<dt>y<span class="classifier">np.1darray</span></dt><dd><p>y coordinate values imported from imzML dataset</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>x<span class="classifier">np.1darray</span></dt><dd><p>remapped x coordinate values</p>
+</dd>
+<dt>y<span class="classifier">np.1darray</span></dt><dd><p>remapped y coordinate values</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="assorted_functions.significance">
+<span class="sig-prename descclassname"><span class="pre">assorted_functions.</span></span><span class="sig-name descname"><span class="pre">significance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pvalue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/assorted_functions.html#significance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#assorted_functions.significance" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="iMSminer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="data_analysis.html" class="btn btn-neutral float-right" title="data_analysis module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, yutinlin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
