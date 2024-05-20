@@ -1,19 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-@author: Yu Tin Lin (yutinlin@stanford.edu)
-@author: Haohui Bao (susanab20020911@gmail.com)
-@author: Boone M. Prentice (booneprentice@ufl.chem.edu)
+Created on Thu May  9 00:39:07 2024
 
-
-Please cite the following if iMSminer is helpful to your publication:
-
-    @software{msalign2024,
-    author = {Lukasz G. Migas},
-    title = {{msalign}: Spectral alignment based on MATLAB's `msalign` function.},
-    url = {https://github.com/lukasz-migas/msalign},
-    version = {0.2.0},
-    year = {2024},
-    }
+@author: yutin
 """
 
 #==============LOAD iMSminer FUNCTIONS================#

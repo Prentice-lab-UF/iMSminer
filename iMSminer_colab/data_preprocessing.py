@@ -9,29 +9,32 @@
 # \item modularize conditional statements and apply decoration functions
 # \item provide function descriptions
 # \item document codes
+print("s1")
 import os
-os.chdir("/home/yutinlin/workspace/iMSminer")
+os.chdir("/content/drive/My Drive/Colab Notebooks/iMSminer_colab")
 from ImzMLParser_chunk import ImzMLParser_chunk
-from assorted_functions import peak_integration, get_chunk_ms_info, get_chunk_ms_info2, get_chunk_ms_info_inhomogeneous, chunk_prep, chunk_prep_inhomogeneous, integrate_peak, get_p2, get_spectrum, Aligner_CPU
+from assorted_functions import get_chunk_ms_info, get_chunk_ms_info2, get_chunk_ms_info_inhomogeneous, chunk_prep, chunk_prep_inhomogeneous, integrate_peak, get_p2, get_spectrum, Aligner_CPU
 import gc
 import time
+print("s2")
 import numpy as np
 import pandas as pd
 import psutil
 import scipy
 from scipy.signal import find_peaks, peak_widths
+print("s3")
 from pyimzml.ImzMLParser import ImzMLParser
 import matplotlib.pyplot as plt
 import ray
 from bokeh.plotting import figure, show, save, output_file
-
+print("s4")
 
 if not ray.is_initialized():
     ray.init(num_cpus=10)
 
 
 try:
-    os.chdir("/home/yutinlin/workspace/iMSminer")
+    os.chdir("/content/drive/My Drive/Colab Notebooks/iMSminer_colab")
     import cupy as cp
     from assorted_functions import Aligner_GPU
 except:

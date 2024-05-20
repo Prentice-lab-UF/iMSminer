@@ -1,19 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-@author: Yu Tin Lin (yutinlin@stanford.edu)
-@author: Haohui Bao (susanab20020911@gmail.com)
-@author: Boone M. Prentice (booneprentice@ufl.chem.edu)
+Created on Thu May  9 00:39:07 2024
 
-
-Please cite the following if iMSminer is helpful to your publication:
-
-    @software{msalign2024,
-    author = {Lukasz G. Migas},
-    title = {{msalign}: Spectral alignment based on MATLAB's `msalign` function.},
-    url = {https://github.com/lukasz-migas/msalign},
-    version = {0.2.0},
-    year = {2024},
-    }
+@author: yutin
 """
 
 #==============LOAD iMSminer FUNCTIONS================#
@@ -31,9 +20,10 @@ import assorted_functions
 
 preprocess = Preprocess()
 preprocess.peak_pick(percent_RAM=5, method="point", generate_spectrum=True)
-preprocess.run(percent_RAM=2, peak_alignment=False, align_halfwidth=15, 
-               grid_iter_num=10, align_reduce=True, reduce_halfwidth=2, 
-               plot_aligned_peak = False, index_peak_plot = 92, plot_num_peaks=10)
+preprocess.run(percent_RAM=1, peak_alignment=False, align_halfwidth=2, 
+               grid_iter_num=10, align_reduce=True, reduce_halfwidth=20, 
+               plot_aligned_peak = True, index_peak_plot = 20, plot_num_peaks=5)
+
 
 
 
@@ -46,7 +36,7 @@ data_analysis.normalize_pixel(normalization="TIC")
 data_analysis.calibrate_mz()
 data_analysis.MS1_search()
 data_analysis.filter_analytes()
-data_analysis.image_clustering(k=10, perplexity=3, zoom=0.3, quantile=95)
+data_analysis.image_clustering(k=10, perplexity=6, zoom=0.3, quantile=95)
 data_analysis.insitu_clustering(k=4,perplexity=25, show_ROI=True, show_square=True)
 data_analysis.make_FC_plot()
 data_analysis.make_boxplot()

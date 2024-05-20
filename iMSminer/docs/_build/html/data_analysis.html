@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_analysis module &mdash; iMSminer_beta 0.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+      <link rel="stylesheet" href="_static/fonts.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="data_preprocessing module" href="data_preprocessing.html" />
+    <link rel="prev" title="assorted_functions module" href="assorted_functions.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            iMSminer_beta
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">iMSminer</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="assorted_functions.html">assorted_functions module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">data_analysis module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_preprocessing.html">data_preprocessing module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="run.html">run module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">iMSminer_beta</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">iMSminer</a></li>
+      <li class="breadcrumb-item active">data_analysis module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/data_analysis.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-data_analysis">
+<span id="data-analysis-module"></span><h1>data_analysis module<a class="headerlink" href="#module-data_analysis" title="Permalink to this heading"></a></h1>
+<p>&#64;author: Yu Tin Lin (<a class="reference external" href="mailto:yutinlin&#37;&#52;&#48;stanford&#46;edu">yutinlin<span>&#64;</span>stanford<span>&#46;</span>edu</a>)
+&#64;author: Haohui Bao (<a class="reference external" href="mailto:susanab20020911&#37;&#52;&#48;gmail&#46;com">susanab20020911<span>&#64;</span>gmail<span>&#46;</span>com</a>)
+&#64;author: Boone M. Prentice (<a class="reference external" href="mailto:booneprentice&#37;&#52;&#48;ufl&#46;chem&#46;edu">booneprentice<span>&#64;</span>ufl<span>&#46;</span>chem<span>&#46;</span>edu</a>)</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="data_analysis.DataAnalysis">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_analysis.</span></span><span class="sig-name descname"><span class="pre">DataAnalysis</span></span><a class="reference internal" href="_modules/data_analysis.html#DataAnalysis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_analysis.DataAnalysis" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_analysis.DataAnalysis.MS1_search">
+<span class="sig-name descname"><span class="pre">MS1_search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ppm_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_analysis.html#DataAnalysis.MS1_search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_analysis.DataAnalysis.MS1_search" title="Permalink to this definition"></a></dt>
+<dd><p>MS1 accurate mass search using</p>
+<dl class="simple">
+<dt>ppm_threshold<span class="classifier">int, optional</span></dt><dd><p>ppm threshold for MS1 accurate mass hits, by default 5</p>
+</dd>
+<dt>ion_type<span class="classifier">str, user input</span></dt><dd><p>ion types of MS1 hits</p>
+</dd>
+<dt>mass_diff<span class="classifier">float, user input</span></dt><dd><p>mass differences of ion types from monoisotopic neutural</p>
+</dd>
+<dt>MS1_db_path<span class="classifier">str, user input</span></dt><dd><p>local file path of MS1 database</p>
+</dd>
+<dt>mz_col<span class="classifier">int, user input</span></dt><dd><p>number denoting column in database corresponding to exact mass of monoisotopic neutral</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_analysis.DataAnalysis.calibrate_mz">
+<span class="sig-name descname"><span class="pre">calibrate_mz</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_analysis.html#DataAnalysis.calibrate_mz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_analysis.DataAnalysis.calibrate_mz" title="Permalink to this definition"></a></dt>
+<dd><p>Interactive calibration using polynomial regression via linear model of user-specified degree</p>
+<dl class="simple">
+<dt>degree<span class="classifier">int, user input</span></dt><dd><p>user-specified degree for linear model used in polynomial regression calibration</p>
+</dd>
+<dt>reference_mz<span class="classifier">array of floats, user input</span></dt><dd><p>user-specified reference massess to perform calibration on</p>
+</dd>
+<dt>calibration_exit<span class="classifier">str, user input</span></dt><dd><p>exits calibration if user specifies <cite>yes</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_analysis.DataAnalysis.filter_analytes">
+<span class="sig-name descname"><span class="pre">filter_analytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MS1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_analysis.html#DataAnalysis.filter_analytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_analysis.DataAnalysis.filter_analytes" title="Permalink to this definition"></a></dt>
+<dd><p>Subset peak-picked untargeted data to analytes of interest</p>
+<dl class="simple">
+<dt>method<span class="classifier">str, optional</span></dt><dd><p>type of filtering, by default “MS1”
+method “MS1” subsets untargeted data to MS1 hits 
+method “analyte_class” subsets untargeted data to specified analyte class(es) from MS1 hits</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_analysis.DataAnalysis.get_ion_image">
+<span class="sig-name descname"><span class="pre">get_ion_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">replicate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_ROI</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_square</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_scheme</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'inferno'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_analysis.html#DataAnalysis.get_ion_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_analysis.DataAnalysis.get_ion_image" title="Permalink to this definition"></a></dt>
+<dd><p>Render ion image for analytes in self._df_pixel_all (filtered or unfiltered)</p>
+<dl class="simple">
+<dt>replicate<span class="classifier">int, optional</span></dt><dd><p>render image from specified replicate (dataset), by default 0</p>
+</dd>
+<dt>show_ROI<span class="classifier">bool, optional</span></dt><dd><p>display specified label in redenred ion image, by default True</p>
+</dd>
+<dt>show_square<span class="classifier">bool, optional</span></dt><dd><p>display selected ROI in green box in rendered ion image, by default False</p>
+</dd>
+<dt>color_scheme<span class="classifier">str, optional</span></dt><dd><p>color scheme of ion image, by default “inferno”. A list of color schemes are available here: <a class="reference external" href="https://matplotlib.org/stable/users/explain/colors/colormaps.html">https://matplotlib.org/stable/users/explain/colors/colormaps.html</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_analysis.DataAnalysis.image_clustering">
+<span class="sig-name descname"><span class="pre">image_clustering</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perplexity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replicate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_ROI</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_square</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_scheme</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'inferno'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zoom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">99</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_analysis.html#DataAnalysis.image_clustering"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_analysis.DataAnalysis.image_clustering" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_analysis.DataAnalysis.insitu_clustering">
+<span class="sig-name descname"><span class="pre">insitu_clustering</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perplexity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replicate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_ROI</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_square</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_analysis.html#DataAnalysis.insitu_clustering"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_analysis.DataAnalysis.insitu_clustering" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_analysis.DataAnalysis.load_preprocessed_data">
+<span class="sig-name descname"><span class="pre">load_preprocessed_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_analysis.html#DataAnalysis.load_preprocessed_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_analysis.DataAnalysis.load_preprocessed_data" title="Permalink to this definition"></a></dt>
+<dd><p>import preprocessed intensity matrix and coordinate arrays, perform ROI annotation and selection, and store information for further data analysis</p>
+<dl class="simple">
+<dt>ROI_num<span class="classifier">int, user input</span></dt><dd><p>user-specified number of ROIs for dataset</p>
+</dd>
+<dt>ROIs<span class="classifier">str, user input</span></dt><dd><p>ROI annotations from left to right, top to bottom</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_analysis.DataAnalysis.make_FC_plot">
+<span class="sig-name descname"><span class="pre">make_FC_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pthreshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">FCthreshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_analysis.html#DataAnalysis.make_FC_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_analysis.DataAnalysis.make_FC_plot" title="Permalink to this definition"></a></dt>
+<dd><p>Generate volcano plots of ROI pairs, showing fold-change statistics and p-values</p>
+<dl class="simple">
+<dt>pthreshold<span class="classifier">float, optional</span></dt><dd><p>p-value threshold for significant alterations in volcano plot, by default 0.05</p>
+</dd>
+<dt>FCthreshold<span class="classifier">float, optional</span></dt><dd><p>fold-change threshold (positive) for dysregulation in volcano plot, by default 1.5</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_analysis.DataAnalysis.make_boxplot">
+<span class="sig-name descname"><span class="pre">make_boxplot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_analysis.html#DataAnalysis.make_boxplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_analysis.DataAnalysis.make_boxplot" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_analysis.DataAnalysis.normalize_pixel">
+<span class="sig-name descname"><span class="pre">normalize_pixel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'TIC'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_analysis.html#DataAnalysis.normalize_pixel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_analysis.DataAnalysis.normalize_pixel" title="Permalink to this definition"></a></dt>
+<dd><p>Normalize pixels using specified method</p>
+<dl class="simple">
+<dt>method<span class="classifier">str, optional</span></dt><dd><p>method to compute normalization factor, by default “TIC”
+method “TIC” normalizes on total ion count over each pixel
+method “RMS” normalizes on root mean square over each pixel
+method “reference” normalizes on a reference analyte specified by m/z or index
+meethod “max” normalizes on maximum intensity of each pixel</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="assorted_functions.html" class="btn btn-neutral float-left" title="assorted_functions module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="data_preprocessing.html" class="btn btn-neutral float-right" title="data_preprocessing module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, yutinlin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
