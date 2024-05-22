@@ -1,7 +1,7 @@
 iMSminer Beta
 
 ## **Welcome to iMSminer!**
-**iMSminer** provides user-friendly, GPU- or compiler-accelerated multi-dataset, multi-ROI, and multi-condition preprocessing and mining of larger-than-memory imaging mass spectrometry datasets in Python.
+**iMSminer** provides user-friendly, partial GPU- or compiler-accelerated multi-dataset, multi-ROI, and multi-condition preprocessing and mining of larger-than-memory imaging mass spectrometry datasets in Python.
 
 ## **Portals**
 - **Quick Start**: https://drive.google.com/drive/folders/12Qjz5zlSMwL42W0X_yZxZVZaVXtlhylo?usp=drive_link 
