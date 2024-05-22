@@ -12,6 +12,11 @@ iMSminer Beta
 - **Support Group**: {insert Google support}
 - **Feedback Forms**: https://forms.gle/W7TwYy7NvewKvb5n8
 
+## **Installation**
+```
+PyPI installation instruction here
+```
+
 ## **Features**
 - Interactive question prompting to enhance user-friendliness
 - Preprocesses imzML datasets with peak picking, mass alignment, and peak integration
