@@ -31,9 +31,17 @@ Please consider citing iMSminer and related modules if iMSminer is helpful to yo
   year = {2024},
 }
 
+@software{pyimzml,
+  author = {Alexandrov Team, EMBL},
+  title = {{pyimzML}: A Parser to Read .imzML Files},
+  url = {https://github.com/alexandrovteam/pyimzML},
+  version = {1.5.4},
+  year = {2024},
+}
+
 @software{msalign2024,
   author = {Lukasz G. Migas},
-  title = {{msalign}: Spectral alignment based on MATLAB's `msalign` function.},
+  title = {{msalign}: Spectral alignment based on MATLAB's `msalign` function},
   url = {https://github.com/lukasz-migas/msalign},
   version = {0.2.0},
   year = {2024},
