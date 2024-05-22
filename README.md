@@ -9,7 +9,7 @@ iMSminer Beta
 - **Documentation**: https://github.com/Prentice-lab-UF/iMSminer/blob/main/iMSminer/docs/_build/html/index.html (to be put on public domain)
 - **Setup Instructions**: {insert setup tutorials}
 - **Support Group**: {insert Google support}
-- **Feedback Forms**: {insert Google forms}
+- **Feedback Forms**: https://forms.gle/W7TwYy7NvewKvb5n8
 
 ## **Features**
 - Interactive question prompting to enhance user-friendliness
