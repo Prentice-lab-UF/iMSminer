@@ -25,7 +25,7 @@ iMSminer Beta
 Please consider citing iMSminer and related modules if iMSminer is helpful to your work
 ```
 @software{imsminer2024,
-  author = {Yu Tin Lin, Haohui Bao, Troy R. Scoggings IV, Boone M. Prentice},
+  author = {Yu Tin Lin and Haohui Bao and Troy R. Scoggings IV and Boone M. Prentice},
   title = {{iMSminer}: A Data Processing and Machine Learning Package for Imaging Mass Spectrometry},
   url = {https://github.com/Prentice-lab-UF/iMSminer},
   version = {beta},
