@@ -15,7 +15,6 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -41,11 +40,8 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../modules.html">iMSminer</a></li>
-</ul>
-
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
         </div>
       </div>
     </nav>
@@ -78,7 +74,6 @@
 <span class="sd">@author: Boone M. Prentice (booneprentice@ufl.chem.edu)</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="c1"># ========= LOAD SOME NICE LIBRARIES ==========#</span>
 <span class="kn">from</span> <span class="nn">matplotlib.offsetbox</span> <span class="kn">import</span> <span class="n">OffsetImage</span><span class="p">,</span> <span class="n">AnnotationBbox</span>
 <span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -88,7 +83,7 @@
 <span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">KMeans</span>
 <span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="kn">import</span> <span class="n">TSNE</span>
 <span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">calinski_harabasz_score</span><span class="p">,</span> <span class="n">davies_bouldin_score</span><span class="p">,</span> <span class="n">silhouette_score</span>
-<span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">njit</span><span class="p">,</span> <span class="n">jit</span>
+<span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">jit</span>
 <span class="kn">import</span> <span class="nn">psutil</span>
 <span class="kn">import</span> <span class="nn">scipy</span>
 <span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">find_peaks</span><span class="p">,</span> <span class="n">peak_widths</span>
@@ -99,14 +94,12 @@
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">gc</span>
-<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s2">&quot;/home/yutinlin/z_drive/Lin/2023/Python/Scripts/msalign&quot;</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">utilities</span> <span class="kn">import</span> <span class="n">check_xy</span><span class="p">,</span> <span class="n">convert_peak_values_to_index</span><span class="p">,</span> <span class="n">convert_peak_values_to_index_gpu</span><span class="p">,</span> <span class="n">generate_function</span><span class="p">,</span> <span class="n">shift</span><span class="p">,</span> <span class="n">time_loop</span><span class="p">,</span> <span class="n">find_nearest_index</span><span class="p">,</span> <span class="n">find_nearest_index_gpu</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s2">&quot;/home/yutinlin/workspace/iMSminer&quot;</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">utilities</span> <span class="kn">import</span> <span class="n">check_xy</span><span class="p">,</span> <span class="n">convert_peak_values_to_index</span><span class="p">,</span> <span class="n">convert_peak_values_to_index_gpu</span><span class="p">,</span> <span class="n">generate_function</span><span class="p">,</span> <span class="n">shift</span><span class="p">,</span> <span class="n">time_loop</span>
 <span class="kn">import</span> <span class="nn">ImzMLParser_chunk</span>
 <span class="kn">from</span> <span class="nn">ImzMLParser_chunk</span> <span class="kn">import</span> <span class="n">ImzMLParser_chunk</span>
-<span class="kn">from</span> <span class="nn">nan_to_num_njit_cupy</span> <span class="kn">import</span> <span class="n">fillna_cpwhere_njit</span>
 <span class="kn">import</span> <span class="nn">ray</span>
 <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;font.size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
-
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">cupy</span> <span class="k">as</span> <span class="nn">cp</span>
@@ -116,7 +109,7 @@
 
 
 <span class="k">if</span> <span class="ow">not</span> <span class="n">ray</span><span class="o">.</span><span class="n">is_initialized</span><span class="p">():</span>
-    <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">num_cpus</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">num_cpus</span><span class="o">=</span><span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Enter a number of CPUs to use for processing: &quot;</span><span class="p">))</span>
 
 
 <span class="n">METHODS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;pchip&quot;</span><span class="p">,</span> <span class="s2">&quot;zero&quot;</span><span class="p">,</span> <span class="s2">&quot;slinear&quot;</span><span class="p">,</span>
@@ -124,7 +117,7 @@
 <span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="Aligner_CPU"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.Aligner_CPU">[docs]</a><span class="k">class</span> <span class="nc">Aligner_CPU</span><span class="p">:</span>
+<div class="viewcode-block" id="Aligner_CPU"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.Aligner_CPU">[docs]</a><span class="k">class</span> <span class="nc">Aligner_CPU</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Alignment class from https://github.com/lukasz-migas/msalign</span>
 
 <span class="sd">    References</span>
@@ -408,7 +401,7 @@
                 <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_iterations</span><span class="p">]</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="Aligner_CPU.run"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.Aligner_CPU.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Aligner_CPU.run"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.Aligner_CPU.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Execute the alignment procedure for each signal in the 2D array and collate the shift/scale vectors&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_iterations</span> <span class="o">=</span> <span class="n">n_iterations</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_iterations</span>
         <span class="c1"># iterate for every signal</span>
@@ -424,7 +417,7 @@
                      <span class="n">time_loop</span><span class="p">(</span><span class="n">t_start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_signals</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_signals</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_computed</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="Aligner_CPU.compute"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.Aligner_CPU.compute">[docs]</a>    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ty</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<div class="viewcode-block" id="Aligner_CPU.compute"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.Aligner_CPU.compute">[docs]</a>    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ty</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute correction factors.</span>
 
 <span class="sd">        This function does not set value in any of the class attributes so can be used in a iterator where values</span>
@@ -472,7 +465,7 @@
                 <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">_shift</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reduce_range_factor</span>
         <span class="k">return</span> <span class="n">shift_opt</span><span class="p">,</span> <span class="n">scale_opt</span></div>
 
-<div class="viewcode-block" id="Aligner_CPU.apply"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.Aligner_CPU.apply">[docs]</a>    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_shifts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Aligner_CPU.apply"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.Aligner_CPU.apply">[docs]</a>    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_shifts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Align the signals against the computed values&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_computed</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
@@ -490,7 +483,7 @@
         <span class="c1"># only return data</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_aligned</span></div>
 
-<div class="viewcode-block" id="Aligner_CPU.align"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.Aligner_CPU.align">[docs]</a>    <span class="k">def</span> <span class="nf">align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shift_opt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scale_opt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Aligner_CPU.align"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.Aligner_CPU.align">[docs]</a>    <span class="k">def</span> <span class="nf">align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shift_opt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scale_opt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Realign array based on the optimized shift and scale parameters</span>
 
 <span class="sd">        Parameters</span>
@@ -522,7 +515,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">shift_value</span><span class="p">)</span> <span class="o">/</span> <span class="n">scale_value</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">))</span>
 
-<div class="viewcode-block" id="Aligner_CPU.shift"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.Aligner_CPU.shift">[docs]</a>    <span class="k">def</span> <span class="nf">shift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shift_opt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Aligner_CPU.shift"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.Aligner_CPU.shift">[docs]</a>    <span class="k">def</span> <span class="nf">shift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shift_opt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Quickly shift array based on the optimized shift parameters.</span>
 
 <span class="sd">        This method does not interpolate but rather moves the data left and right without applying any scaling.</span>
@@ -551,7 +544,7 @@
         <span class="k">return</span> <span class="n">shift</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="n">shift_value</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="Aligner_GPU"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.Aligner_GPU">[docs]</a><span class="k">class</span> <span class="nc">Aligner_GPU</span><span class="p">:</span>
+<div class="viewcode-block" id="Aligner_GPU"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.Aligner_GPU">[docs]</a><span class="k">class</span> <span class="nc">Aligner_GPU</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Alignment class refactored from https://github.com/lukasz-migas/msalign</span>
 
 <span class="sd">    Cite the following if used:</span>
@@ -692,7 +685,7 @@
                 <span class="s2">&quot;Value of &#39;iterations&#39; must be above 0 and be an integer!&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_n_iterations</span> <span class="o">=</span> <span class="n">value</span>
 
-<div class="viewcode-block" id="Aligner_GPU.run"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.Aligner_GPU.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Aligner_GPU.run"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.Aligner_GPU.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Execute the alignment procedure for each signal in the 2D array and collate the shift/scale vectors&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_iterations</span> <span class="o">=</span> <span class="n">n_iterations</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_iterations</span>
         <span class="c1"># iterate for every signal</span>
@@ -708,7 +701,7 @@
                      <span class="n">time_loop</span><span class="p">(</span><span class="n">t_start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_signals</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_signals</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_computed</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="Aligner_GPU.run_batch"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.Aligner_GPU.run_batch">[docs]</a>    <span class="k">def</span> <span class="nf">run_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Aligner_GPU.run_batch"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.Aligner_GPU.run_batch">[docs]</a>    <span class="k">def</span> <span class="nf">run_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Execute the alignment procedure for the entire batch of signals and collate the shift/scale vectors.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_iterations</span> <span class="o">=</span> <span class="n">n_iterations</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_iterations</span>
         <span class="n">t_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
@@ -720,7 +713,7 @@
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Processed </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> signals in </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">t_start</span><span class="si">}</span><span class="s2"> seconds&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_computed</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="Aligner_GPU.compute_batch"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.Aligner_GPU.compute_batch">[docs]</a>    <span class="k">def</span> <span class="nf">compute_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Y</span><span class="p">:</span> <span class="n">cp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ty</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">cp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<div class="viewcode-block" id="Aligner_GPU.compute_batch"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.Aligner_GPU.compute_batch">[docs]</a>    <span class="k">def</span> <span class="nf">compute_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Y</span><span class="p">:</span> <span class="n">cp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ty</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">cp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">cp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute correction factors for a batch of signals.</span>
 
@@ -765,7 +758,7 @@
 
         <span class="k">return</span> <span class="n">shift_opts</span><span class="p">,</span> <span class="n">scale_opts</span></div>
 
-<div class="viewcode-block" id="Aligner_GPU.apply"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.Aligner_GPU.apply">[docs]</a>    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_shifts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Aligner_GPU.apply"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.Aligner_GPU.apply">[docs]</a>    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_shifts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Align the signals against the computed values&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_computed</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
@@ -783,7 +776,7 @@
         <span class="c1"># only return data</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_aligned</span></div>
 
-<div class="viewcode-block" id="Aligner_GPU.align"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.Aligner_GPU.align">[docs]</a>    <span class="k">def</span> <span class="nf">align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shift_opt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scale_opt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Aligner_GPU.align"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.Aligner_GPU.align">[docs]</a>    <span class="k">def</span> <span class="nf">align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shift_opt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scale_opt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Realign array based on the optimized shift and scale parameters</span>
 
 <span class="sd">        Parameters</span>
@@ -812,7 +805,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">shift_value</span><span class="p">)</span> <span class="o">/</span> <span class="n">scale_value</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">cp</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">))</span>
 
-<div class="viewcode-block" id="Aligner_GPU.compute"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.Aligner_GPU.compute">[docs]</a>    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">cp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ty</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<div class="viewcode-block" id="Aligner_GPU.compute"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.Aligner_GPU.compute">[docs]</a>    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">cp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ty</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute correction factors.</span>
 
 <span class="sd">        This function does not set value in any of the class attributes so can be used in a iterator where values</span>
@@ -905,7 +898,7 @@
                 <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_iterations</span><span class="p">]</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="Aligner_GPU.shift"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.Aligner_GPU.shift">[docs]</a>    <span class="k">def</span> <span class="nf">shift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shift_opt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Aligner_GPU.shift"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.Aligner_GPU.shift">[docs]</a>    <span class="k">def</span> <span class="nf">shift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shift_opt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Quickly shift array based on the optimized shift parameters.</span>
 
 <span class="sd">        This method does not interpolate but rather moves the data left and right without applying any scaling.</span>
@@ -934,7 +927,7 @@
         <span class="k">return</span> <span class="n">shift</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="n">shift_value</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="significance"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.significance">[docs]</a><span class="k">def</span> <span class="nf">significance</span><span class="p">(</span><span class="n">pvalue</span><span class="p">):</span>
+<div class="viewcode-block" id="significance"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.significance">[docs]</a><span class="k">def</span> <span class="nf">significance</span><span class="p">(</span><span class="n">pvalue</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">pvalue</span> <span class="o">&lt;=</span> <span class="mf">0.001</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;***&quot;</span>
     <span class="k">elif</span> <span class="n">pvalue</span> <span class="o">&lt;=</span> <span class="mf">0.01</span><span class="p">:</span>
@@ -943,66 +936,8 @@
         <span class="k">return</span> <span class="s2">&quot;*&quot;</span>
     <span class="k">return</span> <span class="s2">&quot;ns&quot;</span></div>
 
-<span class="c1"># ========================PEAK INTEGRATION========================#</span>
 
-
-<div class="viewcode-block" id="peak_integration"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.peak_integration">[docs]</a><span class="k">def</span> <span class="nf">peak_integration</span><span class="p">(</span><span class="n">column</span><span class="p">,</span> <span class="n">intensity_df</span><span class="p">,</span> <span class="n">deviation_df</span><span class="p">,</span> <span class="n">MZ</span><span class="p">,</span> <span class="n">p2_new</span><span class="p">,</span> <span class="n">peak_area_df</span><span class="p">,</span> <span class="n">chunk_0_mz</span><span class="p">):</span>
-    <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">p2_new</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-        <span class="n">count_left</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">count_right</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="n">value</span><span class="p">:</span>
-            <span class="n">value_left</span> <span class="o">=</span> <span class="n">value</span>
-            <span class="n">value_right</span> <span class="o">=</span> <span class="n">value</span>
-            <span class="c1"># while df_test.loc[value_left, &#39;deviation&#39;]==&quot;False&quot;:  #old code where count = 3 is True was previously defined</span>
-            <span class="k">while</span> <span class="n">count_left</span> <span class="o">&lt;</span> <span class="n">count_rep</span><span class="p">:</span>
-                <span class="n">value_left</span> <span class="o">-=</span> <span class="mi">1</span>
-                <span class="k">if</span> <span class="n">deviation_df</span><span class="p">[</span><span class="n">column</span><span class="p">][</span><span class="n">value_left</span><span class="p">]</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
-                    <span class="n">count_left</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">count_left</span> <span class="o">=</span> <span class="mi">0</span>
-                <span class="k">if</span> <span class="n">count_left</span> <span class="o">==</span> <span class="n">count_rep</span><span class="p">:</span>
-                    <span class="c1"># +2 to rely more on symmetry for better peaks at deviating regions</span>
-                    <span class="n">value_left</span> <span class="o">+=</span> <span class="p">(</span><span class="n">count_rep</span><span class="o">-</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
-            <span class="c1"># while df_test.loc[value_right, &#39;deviation&#39;]==&quot;False&quot;:</span>
-            <span class="k">while</span> <span class="n">count_right</span> <span class="o">&lt;</span> <span class="n">count_rep</span><span class="p">:</span>
-                <span class="n">value_right</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="k">if</span> <span class="n">deviation_df</span><span class="p">[</span><span class="n">column</span><span class="p">][</span><span class="n">value_right</span><span class="p">]</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
-                    <span class="n">count_right</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">count_right</span> <span class="o">=</span> <span class="mi">0</span>
-                <span class="k">if</span> <span class="n">count_right</span> <span class="o">==</span> <span class="n">count_rep</span><span class="p">:</span>
-                    <span class="n">value_right</span> <span class="o">-=</span> <span class="p">(</span><span class="n">count_rep</span><span class="o">-</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
-
-            <span class="c1"># value_left += 2</span>
-            <span class="c1"># value_right -= 2</span>
-            <span class="n">extra_bins</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">((</span><span class="n">value</span><span class="o">-</span><span class="n">value_left</span><span class="p">)</span><span class="o">-</span><span class="p">(</span><span class="n">value_right</span><span class="o">-</span><span class="n">value</span><span class="p">))</span>
-            <span class="c1"># +1 adjustment to account for delays in derivatives</span>
-            <span class="k">if</span> <span class="n">extra_bins</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">peak_area</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">intensity_df</span><span class="p">[</span><span class="n">column</span><span class="p">][</span><span class="n">value_left</span><span class="p">:</span><span class="n">value</span><span class="p">],</span> <span class="n">MZ</span><span class="p">[</span><span class="n">value_left</span><span class="p">:</span><span class="n">value</span><span class="p">])</span> <span class="o">+</span>
-                             <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">intensity_df</span><span class="p">[</span><span class="n">column</span><span class="p">][</span><span class="n">value</span><span class="p">:</span><span class="n">value_right</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">MZ</span><span class="p">[</span><span class="n">value</span><span class="p">:</span><span class="n">value_right</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span>
-                             <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">intensity_df</span><span class="p">[</span><span class="n">column</span><span class="p">][</span><span class="n">value_left</span><span class="p">:(</span><span class="n">value_left</span><span class="o">+</span><span class="n">extra_bins</span><span class="o">+</span><span class="mi">1</span><span class="p">)],</span> <span class="n">MZ</span><span class="p">[</span><span class="n">value_left</span><span class="p">:(</span><span class="n">value_left</span><span class="o">+</span><span class="n">extra_bins</span><span class="o">+</span><span class="mi">1</span><span class="p">)]))</span>
-                <span class="c1"># peak_area_df.at[MZ[value], &#39;left_width&#39;] += MZ[value_left]</span>
-                <span class="c1"># peak_area_df.at[MZ[value], &#39;right_width&#39;] += MZ[value_right-1]</span>
-            <span class="k">elif</span> <span class="n">extra_bins</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">peak_area</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">intensity_df</span><span class="p">[</span><span class="n">column</span><span class="p">][</span><span class="n">value_left</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">value</span><span class="p">],</span> <span class="n">MZ</span><span class="p">[</span><span class="n">value_left</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">value</span><span class="p">])</span> <span class="o">+</span>
-                             <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">intensity_df</span><span class="p">[</span><span class="n">column</span><span class="p">][</span><span class="n">value</span><span class="p">:</span><span class="n">value_right</span><span class="p">],</span> <span class="n">MZ</span><span class="p">[</span><span class="n">value</span><span class="p">:</span><span class="n">value_right</span><span class="p">])</span> <span class="o">+</span>
-                             <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">intensity_df</span><span class="p">[</span><span class="n">column</span><span class="p">][(</span><span class="n">value_right</span><span class="o">+</span><span class="n">extra_bins</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span><span class="n">value_right</span><span class="p">],</span> <span class="n">MZ</span><span class="p">[(</span><span class="n">value_right</span><span class="o">+</span><span class="n">extra_bins</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span><span class="n">value_right</span><span class="p">]))</span>
-                <span class="c1"># peak_area_df.at[MZ[value], &#39;left_width&#39;] += MZ[value_left+1]</span>
-                <span class="c1"># peak_area_df.at[MZ[value], &#39;right_width&#39;] += MZ[value_right]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">peak_area</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">intensity_df</span><span class="p">[</span><span class="n">column</span><span class="p">][</span><span class="n">value_left</span><span class="p">:</span><span class="n">value</span><span class="p">],</span> <span class="n">MZ</span><span class="p">[</span><span class="n">value_left</span><span class="p">:</span><span class="n">value</span><span class="p">])</span> <span class="o">+</span>
-                             <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">intensity_df</span><span class="p">[</span><span class="n">column</span><span class="p">][</span><span class="n">value</span><span class="p">:</span><span class="n">value_right</span><span class="p">],</span> <span class="n">MZ</span><span class="p">[</span><span class="n">value</span><span class="p">:</span><span class="n">value_right</span><span class="p">]))</span>
-                <span class="c1"># peak_area_df.at[MZ[value], &#39;left_width&#39;] += MZ[value_left]</span>
-                <span class="c1"># peak_area_df.at[MZ[value], &#39;right_width&#39;] += MZ[value_right]</span>
-            <span class="n">peak_area_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">peak_area</span>
-            <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span></div>
-
-
-<span class="c1"># ========================PROCESSING CHUNKED DATA========================#</span>
-
-<div class="viewcode-block" id="get_chunk_ms_info"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.get_chunk_ms_info">[docs]</a><span class="k">def</span> <span class="nf">get_chunk_ms_info</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">chunk_start</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">):</span>
+<div class="viewcode-block" id="get_chunk_ms_info"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.get_chunk_ms_info">[docs]</a><span class="k">def</span> <span class="nf">get_chunk_ms_info</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">chunk_start</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a dictionary of intensity, m/z, and coordinate values by iterating through a chunk of imzML data</span>
 
 <span class="sd">    Parameters</span>
@@ -1041,7 +976,7 @@
     <span class="k">return</span> <span class="n">ms_dict</span></div>
 
 
-<div class="viewcode-block" id="get_chunk_ms_info2"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.get_chunk_ms_info2">[docs]</a><span class="k">def</span> <span class="nf">get_chunk_ms_info2</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">chunk_start</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">):</span>
+<div class="viewcode-block" id="get_chunk_ms_info2"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.get_chunk_ms_info2">[docs]</a><span class="k">def</span> <span class="nf">get_chunk_ms_info2</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">chunk_start</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a dictionary of intensity, m/z, and coordinate values from a chunk of imzML data</span>
 
 <span class="sd">    Parameters</span>
@@ -1078,7 +1013,7 @@
     <span class="k">return</span> <span class="n">ms_dict</span></div>
 
 
-<div class="viewcode-block" id="get_chunk_ms_info_inhomogeneous"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.get_chunk_ms_info_inhomogeneous">[docs]</a><span class="k">def</span> <span class="nf">get_chunk_ms_info_inhomogeneous</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">chunk_start</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">,</span> <span class="n">max_mz</span><span class="p">,</span> <span class="n">min_mz</span><span class="p">,</span> <span class="n">mz_RP</span><span class="p">,</span> <span class="n">RP</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">rp_factor</span><span class="p">):</span>
+<div class="viewcode-block" id="get_chunk_ms_info_inhomogeneous"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.get_chunk_ms_info_inhomogeneous">[docs]</a><span class="k">def</span> <span class="nf">get_chunk_ms_info_inhomogeneous</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">chunk_start</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">,</span> <span class="n">max_mz</span><span class="p">,</span> <span class="n">min_mz</span><span class="p">,</span> <span class="n">mz_RP</span><span class="p">,</span> <span class="n">RP</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">rp_factor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a dictionary of intensity, m/z, and coordinate values from a chunk of imzML data of inhomogeneous shapes</span>
 
 <span class="sd">    Parameters</span>
@@ -1119,25 +1054,13 @@
     <span class="k">return</span> <span class="n">ms_dict</span></div>
 
 
-<span class="c1"># ========================PREPARE AND CALCULATE P2========================#</span>
-
-<div class="viewcode-block" id="chunk_prep"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.chunk_prep">[docs]</a><span class="k">def</span> <span class="nf">chunk_prep</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">percent_RAM</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+<div class="viewcode-block" id="chunk_prep"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.chunk_prep">[docs]</a><span class="k">def</span> <span class="nf">chunk_prep</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">percent_RAM</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Prepares parameters used in chunking. Imports imzML datasets using pyimzml.ImzMLParser (https://github.com/alexandrovteam/pyimzML)</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    p :  pyimzml.ImzMLParser</span>
 <span class="sd">        The data to process, converted to ImzMLParser from the .imzML raw date file.</span>
-<span class="sd">    min_mz : float</span>
-<span class="sd">        minimum m/z in inhomogeneous dataset</span>
-<span class="sd">    max_mz : float</span>
-<span class="sd">        maximum m/z in inhomogeneous dataset</span>
-<span class="sd">    mz_RP : float</span>
-<span class="sd">        m/z in which resolving power (FWHM) is calculated</span>
-<span class="sd">    RP : float</span>
-<span class="sd">        resolving power (FWHM) at m/z {mz_RP}</span>
-<span class="sd">    dist : int</span>
-<span class="sd">        minimum number of datapoints for peak separation</span>
 <span class="sd">    percent_RAM : int, optional</span>
 <span class="sd">        percent available RAM occupied by chunk, by default 5</span>
 
@@ -1178,7 +1101,7 @@
     <span class="k">return</span> <span class="n">num_chunks</span><span class="p">,</span> <span class="n">chunk_size_base</span><span class="p">,</span> <span class="n">chunk_start</span><span class="p">,</span> <span class="n">remainder</span></div>
 
 
-<div class="viewcode-block" id="chunk_prep_inhomogeneous"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.chunk_prep_inhomogeneous">[docs]</a><span class="k">def</span> <span class="nf">chunk_prep_inhomogeneous</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">min_mz</span><span class="p">,</span> <span class="n">max_mz</span><span class="p">,</span> <span class="n">mz_RP</span><span class="p">,</span> <span class="n">RP</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">percent_RAM</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+<div class="viewcode-block" id="chunk_prep_inhomogeneous"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.chunk_prep_inhomogeneous">[docs]</a><span class="k">def</span> <span class="nf">chunk_prep_inhomogeneous</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">min_mz</span><span class="p">,</span> <span class="n">max_mz</span><span class="p">,</span> <span class="n">mz_RP</span><span class="p">,</span> <span class="n">RP</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">percent_RAM</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Prepares parameters used in chunking for imzML datasets of inhomogeneous shapes. Imports imzML datasets using pyimzml.ImzMLParser (https://github.com/alexandrovteam/pyimzML)</span>
 
 <span class="sd">    Parameters</span>
@@ -1208,7 +1131,7 @@
 <span class="sd">    chunk_start: int</span>
 <span class="sd">        The row index location of where the first chunck starts in the .</span>
 <span class="sd">    remainder: int</span>
-<span class="sd">        The remaining columns of data after assigning each chunk a minimal number of columns.</span>
+<span class="sd">        Remainder columns after chunk_size_base division</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
@@ -1235,7 +1158,7 @@
     <span class="k">return</span> <span class="n">num_chunks</span><span class="p">,</span> <span class="n">chunk_size_base</span><span class="p">,</span> <span class="n">chunk_start</span><span class="p">,</span> <span class="n">remainder</span></div>
 
 
-<div class="viewcode-block" id="integrate_peak"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.integrate_peak">[docs]</a><span class="k">def</span> <span class="nf">integrate_peak</span><span class="p">(</span><span class="n">chunk_ms_dict</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p2_width</span><span class="p">,</span> <span class="n">chunk_0_mz_peaks</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;peak_width&quot;</span><span class="p">,</span> <span class="n">remove_duplicates</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="integrate_peak"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.integrate_peak">[docs]</a><span class="k">def</span> <span class="nf">integrate_peak</span><span class="p">(</span><span class="n">chunk_ms_dict</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p2_width</span><span class="p">,</span> <span class="n">chunk_0_mz_peaks</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;peak_width&quot;</span><span class="p">,</span> <span class="n">remove_duplicates</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Peak integration based on p2_width over chunk_ns_dict</span>
 
 <span class="sd">    Parameters</span>
@@ -1244,9 +1167,9 @@
 <span class="sd">        Chunking output from get_chunk_ms_info()</span>
 <span class="sd">    p2 : array of int</span>
 <span class="sd">        Peak indices from peak picking</span>
-<span class="sd">    p2_width : array of float</span>
+<span class="sd">    p2_width : np.1darray</span>
 <span class="sd">        Peak regions computed by np.peak_widths</span>
-<span class="sd">    chunk_0_mz_peaks : array of float</span>
+<span class="sd">    chunk_0_mz_peaks : np.1darray</span>
 <span class="sd">        m/z values mapped by p2</span>
 <span class="sd">    method : str</span>
 <span class="sd">        Peak integration method. Peak_width is currently the only supported option,</span>
@@ -1290,7 +1213,7 @@
     <span class="k">return</span> <span class="n">peak_area_df_temp</span></div>
 
 
-<div class="viewcode-block" id="get_p2"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.get_p2">[docs]</a><span class="k">def</span> <span class="nf">get_p2</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">loq</span><span class="p">,</span> <span class="n">lwr</span><span class="p">,</span> <span class="n">upr</span><span class="p">,</span> <span class="n">rel_height</span><span class="p">,</span> <span class="n">chunk_size_base</span><span class="p">,</span> <span class="n">num_chunks</span><span class="p">,</span> <span class="n">chunk_start</span><span class="p">,</span> <span class="n">remainder</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;point&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="get_p2"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.get_p2">[docs]</a><span class="k">def</span> <span class="nf">get_p2</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">loq</span><span class="p">,</span> <span class="n">lwr</span><span class="p">,</span> <span class="n">upr</span><span class="p">,</span> <span class="n">rel_height</span><span class="p">,</span> <span class="n">chunk_size_base</span><span class="p">,</span> <span class="n">num_chunks</span><span class="p">,</span> <span class="n">chunk_start</span><span class="p">,</span> <span class="n">remainder</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;point&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;_summary_</span>
 
 <span class="sd">    Parameters</span>
@@ -1305,25 +1228,35 @@
 <span class="sd">        upper m/z bound of a region in spectrum without signals</span>
 <span class="sd">    rel_height : float, optional</span>
 <span class="sd">        peak height cutoff for peak integration, by default 0.9</span>
-<span class="sd">    chunk_size_base : _type_</span>
-<span class="sd">        _description_</span>
-<span class="sd">    num_chunks : _type_</span>
-<span class="sd">        _description_</span>
-<span class="sd">    chunk_start : _type_</span>
-<span class="sd">        _description_</span>
-<span class="sd">    remainder : _type_</span>
-<span class="sd">        _description_</span>
+<span class="sd">    num_chunks: int</span>
+<span class="sd">        Number of chunks the data needs to be devided into to optimize the use of</span>
+<span class="sd">        avilable RAM on the computer.</span>
+<span class="sd">    chunk_size_base: int</span>
+<span class="sd">        The minimal number of columns in each chunk.</span>
+<span class="sd">    chunk_start: int</span>
+<span class="sd">        The row index location of where the first chunck starts in the .</span>
+<span class="sd">    remainder: int</span>
+<span class="sd">        Remainder columns after chunk_size_base division</span>
 <span class="sd">    dist : int</span>
-<span class="sd">        minimum number of datapoints for peak separation</span>
-<span class="sd">    noise : int, optional</span>
-<span class="sd">        _description_, by default 0</span>
-<span class="sd">    method : str, optional</span>
-<span class="sd">        _description_, by default &quot;point&quot;</span>
+<span class="sd">        Minimum number of datapoints for peak separation</span>
+<span class="sd">    method of computing noise, by default &quot;point&quot;</span>
+<span class="sd">        method `point` takes specified lower and upper m/z bound of a region in spectrum without signals and compute its standard deviation to define noise level</span>
+<span class="sd">        method `specify_noise` takes user-specified noise level</span>
+<span class="sd">        method `automatic` computes standard deviation of non-outliers (&lt; k * z_score), where k is specified by user</span>
+<span class="sd">        method `binning` re-bins mass spectra (userful for compressed data with inhomogeneous shapes), then computes noise using method &quot;automatic&quot;</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    _type_</span>
-<span class="sd">        _description_</span>
+<span class="sd">    p2 : np.1darray</span>
+<span class="sd">        m/z bin indices corresponding to peak-picked maxima</span>
+<span class="sd">    p2_width : np.1darray</span>
+<span class="sd">        Peak regions computed by np.peak_widths</span>
+<span class="sd">    noise : float</span>
+<span class="sd">        Computed noise level used in peak-picking</span>
+<span class="sd">    mzs : np.1darray</span>
+<span class="sd">        m/z values element-indexed to m/z bins</span>
+<span class="sd">    avg_spectrum : np.1darray</span>
+<span class="sd">        Mean mass spectrum from imzML dataset</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">index_stop</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">getmz</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mf">0.999</span><span class="p">)</span>
     <span class="n">avg_spectrum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">index_stop</span><span class="p">)</span>
@@ -1359,7 +1292,7 @@
     <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;point&quot;</span><span class="p">:</span>
         <span class="n">noise</span> <span class="o">/=</span> <span class="n">num_chunks</span>
     <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;specify_noise&quot;</span><span class="p">:</span>
-        <span class="n">noise</span> <span class="o">=</span> <span class="n">noise</span>
+        <span class="n">noise</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Specify a noise level for peak-picking, such that loq = k * noise. &quot;</span><span class="p">)</span>
 
     <span class="n">p2</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">find_peaks</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">avg_spectrum</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">loq</span><span class="o">*</span><span class="n">noise</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="n">dist</span><span class="p">)</span>
     <span class="n">p2_width</span> <span class="o">=</span> <span class="n">peak_widths</span><span class="p">(</span><span class="n">avg_spectrum</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">rel_height</span><span class="o">=</span><span class="n">rel_height</span><span class="p">)</span>
@@ -1370,7 +1303,7 @@
 
 <span class="c1"># ===from transfer_learning_python===#</span>
 
-<div class="viewcode-block" id="remapping_coords"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.remapping_coords">[docs]</a><span class="k">def</span> <span class="nf">remapping_coords</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<div class="viewcode-block" id="remapping_coords"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.remapping_coords">[docs]</a><span class="k">def</span> <span class="nf">remapping_coords</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Remap x,y coordinate values on arbitrary scale to minima (0, 0) with steps of 1</span>
 
 <span class="sd">    Parameters</span>
@@ -1401,54 +1334,7 @@
     <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span></div>
 
 
-<div class="viewcode-block" id="make_image"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.make_image">[docs]</a><span class="k">def</span> <span class="nf">make_image</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Construct images with RGB channels and single channel. RGB conversion to rainbow scheme from grayscale image.</span>
-<span class="sd">    -----</span>
-<span class="sd">    inputs:</span>
-<span class="sd">        matrix: intensity matrix of molecular images as vectors in axis 0</span>
-<span class="sd">        x: remapped x-coordinates</span>
-<span class="sd">        y: remapped y-coordinates</span>
-<span class="sd">    -----</span>
-<span class="sd">    outputs:</span>
-<span class="sd">        RGB-transformed and grayscale images</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-
-    <span class="n">x_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-    <span class="n">y_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-    <span class="n">x_min</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-    <span class="n">y_min</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-
-    <span class="n">img_array_3c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">([</span><span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">x_max</span><span class="o">+</span><span class="mi">1</span><span class="o">-</span><span class="n">x_min</span><span class="p">,</span> <span class="n">y_max</span><span class="o">+</span><span class="mi">1</span><span class="o">-</span><span class="n">y_min</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
-    <span class="n">img_array_1c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">([</span><span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">x_max</span><span class="o">+</span><span class="mi">1</span><span class="o">-</span><span class="n">x_min</span><span class="p">,</span> <span class="n">y_max</span><span class="o">+</span><span class="mi">1</span><span class="o">-</span><span class="n">y_min</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-
-    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">2</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">color_img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">applyColorMap</span><span class="p">(</span>
-                <span class="n">matrix</span><span class="p">[</span><span class="n">matrix</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">k</span><span class="p">]]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">),</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLORMAP_RAINBOW</span><span class="p">)</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="n">color_img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
-                <span class="p">[</span><span class="n">matrix</span><span class="p">[</span><span class="n">matrix</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">k</span><span class="p">]]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-
-        <span class="k">for</span> <span class="n">row</span><span class="p">,</span> <span class="n">coord</span> <span class="ow">in</span> <span class="n">matrix</span><span class="p">[</span><span class="n">matrix</span><span class="o">.</span><span class="n">columns</span><span class="p">[[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]]]</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
-            <span class="n">row</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
-            <span class="n">img_array_1c</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">coord</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">x_min</span><span class="p">,</span> <span class="n">coord</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span> <span class="o">-</span>
-                         <span class="n">y_min</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">[</span><span class="n">matrix</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">k</span><span class="p">]][</span><span class="n">row</span><span class="p">]</span>
-            <span class="n">img_array_3c</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">coord</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">x_min</span><span class="p">,</span> <span class="n">coord</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span> <span class="o">-</span>
-                         <span class="n">y_min</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">color_img</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>  <span class="c1"># 0:2 RGB</span>
-
-    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">img_array_1c</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Nan exists in single-channel images&#39;</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">img_array_3c</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Nan exists in rainbow images&#39;</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">img_array_3c</span><span class="p">,</span> <span class="n">img_array_1c</span></div>
-
-
-<div class="viewcode-block" id="make_image_1c"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.make_image_1c">[docs]</a><span class="k">def</span> <span class="nf">make_image_1c</span><span class="p">(</span><span class="n">data_2darray</span><span class="p">,</span> <span class="n">remap_coord</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="make_image_1c"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.make_image_1c">[docs]</a><span class="k">def</span> <span class="nf">make_image_1c</span><span class="p">(</span><span class="n">data_2darray</span><span class="p">,</span> <span class="n">remap_coord</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Map pixel-indexed intensity values to x,y-coordinate values. Just-in-time compiler implementation</span>
 
 <span class="sd">     Parameters</span>
@@ -1491,24 +1377,7 @@
     <span class="k">return</span> <span class="n">img_array_1c</span></div>
 
 
-<div class="viewcode-block" id="max_normalize"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.max_normalize">[docs]</a><span class="k">def</span> <span class="nf">max_normalize</span><span class="p">(</span><span class="n">data_2darray</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Normalize on maximum value of each pixel </span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    data_2darray : np.2darray</span>
-<span class="sd">        2darray converted from intensity matrix extracted from imzML dataset </span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    np.2darray</span>
-<span class="sd">        max-normalized 2darray from intensity matrix extracted from imzML dataset</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">data_2darray</span> <span class="o">=</span> <span class="n">data_2darray</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">data_2darray</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_2darray</span></div>
-
-
-<div class="viewcode-block" id="make_image_1c_njit"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.make_image_1c_njit">[docs]</a><span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="viewcode-block" id="make_image_1c_njit"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.make_image_1c_njit">[docs]</a><span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">make_image_1c_njit</span><span class="p">(</span><span class="n">data_2darray</span><span class="p">,</span> <span class="n">img_array_1c</span><span class="p">,</span> <span class="n">remap_coord</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Map pixel-indexed intensity values to x,y-coordinate values. Just-in-time compiler implementation</span>
 
@@ -1545,7 +1414,24 @@
     <span class="k">return</span> <span class="n">img_array_1c</span></div>
 
 
-<div class="viewcode-block" id="draw_ROI"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.draw_ROI">[docs]</a><span class="k">def</span> <span class="nf">draw_ROI</span><span class="p">(</span><span class="n">ROI_info</span><span class="p">,</span> <span class="n">show_ROI</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_square</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<div class="viewcode-block" id="max_normalize"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.max_normalize">[docs]</a><span class="k">def</span> <span class="nf">max_normalize</span><span class="p">(</span><span class="n">data_2darray</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Normalize on maximum value of each pixel </span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data_2darray : np.2darray</span>
+<span class="sd">        2darray converted from intensity matrix extracted from imzML dataset </span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.2darray</span>
+<span class="sd">        max-normalized 2darray from intensity matrix extracted from imzML dataset</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data_2darray</span> <span class="o">=</span> <span class="n">data_2darray</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">data_2darray</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data_2darray</span></div>
+
+
+<div class="viewcode-block" id="draw_ROI"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.draw_ROI">[docs]</a><span class="k">def</span> <span class="nf">draw_ROI</span><span class="p">(</span><span class="n">ROI_info</span><span class="p">,</span> <span class="n">show_ROI</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_square</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Visualize selected ROI region in a green box</span>
 
 <span class="sd">    Parameters</span>
@@ -1577,7 +1463,7 @@
                      <span class="n">horizontalalignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="n">ROI_info</span><span class="p">[</span><span class="s1">&#39;right&#39;</span><span class="p">])</span><span class="o">/</span><span class="mi">8</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="build_effnet"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.build_effnet">[docs]</a><span class="k">def</span> <span class="nf">build_effnet</span><span class="p">(</span><span class="n">image_array</span><span class="p">):</span>
+<div class="viewcode-block" id="build_effnet"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.build_effnet">[docs]</a><span class="k">def</span> <span class="nf">build_effnet</span><span class="p">(</span><span class="n">image_array</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Build a CNN feature extractor using EfficientNetV2L</span>
 <span class="sd">    -----</span>
@@ -1606,7 +1492,7 @@
     <span class="k">return</span> <span class="n">model</span></div>
 
 
-<div class="viewcode-block" id="gromov_trick"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.gromov_trick">[docs]</a><span class="k">def</span> <span class="nf">gromov_trick</span><span class="p">(</span><span class="n">image_array</span><span class="p">):</span>
+<div class="viewcode-block" id="gromov_trick"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.gromov_trick">[docs]</a><span class="k">def</span> <span class="nf">gromov_trick</span><span class="p">(</span><span class="n">image_array</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Preprocesses each vector of images in original or CNN space for Euclidean metric</span>
 <span class="sd">    -----</span>
@@ -1624,7 +1510,7 @@
     <span class="k">return</span> <span class="n">normalized_image_array</span></div>
 
 
-<div class="viewcode-block" id="clustering_in_embedding"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.clustering_in_embedding">[docs]</a><span class="k">def</span> <span class="nf">clustering_in_embedding</span><span class="p">(</span><span class="n">image_array</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">compute_index</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="clustering_in_embedding"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.clustering_in_embedding">[docs]</a><span class="k">def</span> <span class="nf">clustering_in_embedding</span><span class="p">(</span><span class="n">image_array</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">compute_index</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Performs k-means clustering and t-SNE dimensionality reduction. Currently fixed parameters.</span>
 <span class="sd">    -----</span>
@@ -1667,7 +1553,7 @@
         <span class="k">return</span> <span class="n">kmeans_labels</span><span class="p">,</span> <span class="n">tsne_embedding</span><span class="p">,</span> <span class="n">score_dict</span></div>
 
 
-<div class="viewcode-block" id="plot_image_at_point"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.plot_image_at_point">[docs]</a><span class="k">def</span> <span class="nf">plot_image_at_point</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">xy</span><span class="p">,</span> <span class="n">zoom</span><span class="p">,</span> <span class="n">color_scheme</span><span class="o">=</span><span class="s2">&quot;inferno&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="plot_image_at_point"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.plot_image_at_point">[docs]</a><span class="k">def</span> <span class="nf">plot_image_at_point</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">xy</span><span class="p">,</span> <span class="n">zoom</span><span class="p">,</span> <span class="n">color_scheme</span><span class="o">=</span><span class="s2">&quot;inferno&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Plots a tiny image at point xy for visualization with dimensionally reduced embedding.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
@@ -1679,7 +1565,7 @@
     <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">add_artist</span><span class="p">(</span><span class="n">ab</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_spectrum"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.get_spectrum">[docs]</a><span class="k">def</span> <span class="nf">get_spectrum</span><span class="p">(</span><span class="n">output_filepath</span><span class="p">,</span> <span class="n">mzs</span><span class="p">,</span> <span class="n">avg_intensity</span><span class="p">,</span> <span class="n">p2</span><span class="p">):</span>
+<div class="viewcode-block" id="get_spectrum"><a class="viewcode-back" href="../docs/assorted_functions.html#assorted_functions.get_spectrum">[docs]</a><span class="k">def</span> <span class="nf">get_spectrum</span><span class="p">(</span><span class="n">output_filepath</span><span class="p">,</span> <span class="n">mzs</span><span class="p">,</span> <span class="n">avg_intensity</span><span class="p">,</span> <span class="n">p2</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate interactive mean spectrum and stores at output_filepath</span>
 
 <span class="sd">    Parameters</span>
@@ -1725,40 +1611,6 @@
 
     <span class="n">save</span><span class="p">(</span><span class="n">ms_spectrum</span><span class="p">)</span></div>
 
-<span class="c1"># IPython-based ROI selection; for notebooks on remote networks</span>
-
-
-<div class="viewcode-block" id="bbox_select"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.bbox_select">[docs]</a><span class="k">class</span> <span class="nc">bbox_select</span><span class="p">():</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">im</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">move</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">im</span> <span class="o">=</span> <span class="n">im</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">selected_points</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">img</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">im</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ka</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">mpl_connect</span><span class="p">(</span><span class="s1">&#39;button_press_event&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">onclick</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="n">disconnect_button</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Disconnect mpl&quot;</span><span class="p">)</span>
-        <span class="n">Disp</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">disconnect_button</span><span class="p">)</span>
-        <span class="n">disconnect_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">disconnect_mpl</span><span class="p">)</span>
-
-<div class="viewcode-block" id="bbox_select.poly_img"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.bbox_select.poly_img">[docs]</a>    <span class="k">def</span> <span class="nf">poly_img</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">pts</span><span class="p">):</span>
-        <span class="n">pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
-        <span class="n">pts</span> <span class="o">=</span> <span class="n">pts</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-        <span class="n">cv2</span><span class="o">.</span><span class="n">polylines</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="p">[</span><span class="n">pts</span><span class="p">],</span> <span class="kc">True</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span>
-            <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)),</span> <span class="mi">7</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">img</span></div>
-
-<div class="viewcode-block" id="bbox_select.onclick"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.bbox_select.onclick">[docs]</a>    <span class="k">def</span> <span class="nf">onclick</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
-        <span class="c1"># display(str(event))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">selected_points</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">event</span><span class="o">.</span><span class="n">xdata</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">ydata</span><span class="p">])</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selected_points</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fig</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">poly_img</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">im</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">selected_points</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">move</span> <span class="o">=</span> <span class="kc">True</span></div>
-
-<div class="viewcode-block" id="bbox_select.disconnect_mpl"><a class="viewcode-back" href="../assorted_functions.html#assorted_functions.bbox_select.disconnect_mpl">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect_mpl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">mpl_disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ka</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>
