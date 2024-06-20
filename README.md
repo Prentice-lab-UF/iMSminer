@@ -30,7 +30,9 @@ pip install iMSminer
 2. pip install cupy
 ```
 #### **RAPIDS** (https://rapids.ai/)
-https://docs.rapids.ai/install?_gl=1*1p3fcd0*_ga*MTQxMDQwNDI5NC4xNzE0ODU0NzQx*_ga_RKXFW6CM42*MTcxODg1NzY3MS4xMS4xLjE3MTg4NTc4NTYuNjAuMC4w#wsl2
+```
+Follow steps from (https://docs.rapids.ai/install?_gl=1*1p3fcd0*_ga*MTQxMDQwNDI5NC4xNzE0ODU0NzQx*_ga_RKXFW6CM42*MTcxODg1NzY3MS4xMS4xLjE3MTg4NTc4NTYuNjAuMC4w#wsl2)
+```
 
 ## **Citation**
 Please consider citing iMSminer and related modules if iMSminer is helpful to your work
