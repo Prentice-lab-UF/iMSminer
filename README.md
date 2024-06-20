@@ -8,13 +8,6 @@ iMSminer Alpha
 - **Tutorials and Documentation**: https://github.com/Prentice-lab-UF/iMSminer/blob/main/iMSminer/docs/_build/html/index.html (to be put on public domain)
 - **Feedback Forms**: https://forms.gle/W7TwYy7NvewKvb5n8
 
-## **Installation**
-### **iMSminer with CPU**
-```
-pip install iMSminer
-```
-
-
 ## **Features**
 - Interactive question prompts to enhance user-friendliness
 - Preprocesses imzML datasets with peak picking, baseline subtraction, mass alignment, and peak integration
@@ -24,6 +17,17 @@ pip install iMSminer
 - Univariate fold-change statistics with ROI comparisons
 - Visualiztion of ion image and ion statistics 
 
+## **Installation**
+### **iMSminer**
+```
+pip install iMSminer
+```
+### **GPU-Accelerated Packages**
+#### **Cupy** (https://docs.cupy.dev/en/stable/install.html)
+```
+1. Download CUDA Toolkit (https://developer.nvidia.com/cuda-toolkit)
+1. pip install cupy
+```
 
 ## **Citation**
 Please consider citing iMSminer and related modules if iMSminer is helpful to your work
