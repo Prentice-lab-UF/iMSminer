@@ -15,9 +15,10 @@ iMSminer Alpha
 - Optional data normalization, internal calibration, MS1 search, MS2 confirmation, and analyte filtering
 - Unsupervised learning to extract patterns based on molecular co-localization or *in situ* molecular profile
 - Univariate fold-change statistics with ROI comparisons
-- Visualiztion of ion image and ion statistics 
+- Visualiztion of ion image and ion statistics
+- Easily run on Google Colab
 
-## **Installation**
+## **Installation (Local)**
 ### **iMSminer**
 ```
 pip install iMSminer
@@ -26,8 +27,10 @@ pip install iMSminer
 #### **Cupy** (https://docs.cupy.dev/en/stable/install.html)
 ```
 1. Download CUDA Toolkit (https://developer.nvidia.com/cuda-toolkit)
-1. pip install cupy
+2. pip install cupy
 ```
+#### **RAPIDS** (https://rapids.ai/)
+https://docs.rapids.ai/install?_gl=1*1p3fcd0*_ga*MTQxMDQwNDI5NC4xNzE0ODU0NzQx*_ga_RKXFW6CM42*MTcxODg1NzY3MS4xMS4xLjE3MTg4NTc4NTYuNjAuMC4w#wsl2
 
 ## **Citation**
 Please consider citing iMSminer and related modules if iMSminer is helpful to your work
