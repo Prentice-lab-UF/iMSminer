@@ -27,6 +27,9 @@ pip install iMSminer
 #### [**Cupy**](https://docs.cupy.dev/en/stable/install.html)
 #### [**RAPIDS**](https://docs.rapids.ai/install?_gl=1*1p3fcd0*_ga*MTQxMDQwNDI5NC4xNzE0ODU0NzQx*_ga_RKXFW6CM42*MTcxODg1NzY3MS4xMS4xLjE3MTg4NTc4NTYuNjAuMC4w#wsl2)
 
+## **Call for Contributions**
+We appreciate contributions of any form, from feedback to debugging to method development. We enthusiastically welcome developers to interface their published models with iMSminer and host quickstart guides on Google Colab. Please feel free to contact us at [prenticelabuf@gmail.com](mailto:prenticelabuf@gmail.com). 
+
 ## **Citation**
 Please consider citing iMSminer and related packages if iMSminer is helpful to your work
 ```
