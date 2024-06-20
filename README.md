@@ -20,15 +20,13 @@ iMSminer Alpha
 
 ## **Installation (Local)**
 ### **iMSminer**
-```
+```Python
 pip install iMSminer
 ```
 ### **GPU-Accelerated Packages**
-#### **Cupy** (https://docs.cupy.dev/en/stable/install.html)
-```
-1. Download CUDA Toolkit (https://developer.nvidia.com/cuda-toolkit)
-2. pip install cupy
-```
+#### [**Cupy**](https://docs.cupy.dev/en/stable/install.html)
+#### [**RAPIDS**](https://docs.rapids.ai/install?_gl=1*1p3fcd0*_ga*MTQxMDQwNDI5NC4xNzE0ODU0NzQx*_ga_RKXFW6CM42*MTcxODg1NzY3MS4xMS4xLjE3MTg4NTc4NTYuNjAuMC4w#wsl2)
+
 #### **RAPIDS** (https://rapids.ai/)
 Link to instructions: 
 ```
