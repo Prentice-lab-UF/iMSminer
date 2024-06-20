@@ -34,7 +34,7 @@ Please consider citing iMSminer and related modules if iMSminer is helpful to yo
   author = {Yu Tin Lin and Haohui Bao and Troy R. Scoggings IV and Boone M. Prentice},
   title = {{iMSminer}: A Data Processing and Machine Learning Package for Imaging Mass Spectrometry},
   url = {https://github.com/Prentice-lab-UF/iMSminer},
-  version = {beta},
+  version = {1.0.0},
   year = {2024},
 }
 
