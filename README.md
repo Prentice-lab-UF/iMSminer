@@ -6,7 +6,7 @@ iMSminer Alpha
 ## **Portals**
 - [**Quick Start**](https://drive.google.com/drive/folders/12Qjz5zlSMwL42W0X_yZxZVZaVXtlhylo?usp=drive_link) 
 - [**Tutorials and Documentation**](https://github.com/Prentice-lab-UF/iMSminer/blob/main/iMSminer/docs/_build/html/index.html) 
-- [**Feedback Forms**](https://forms.gle/W7TwYy7NvewKvb5n8)
+- [**Feedback Forms**](https://forms.gle/C16Hrp9ibdtWgyH17)
 
 ## **Features**
 - Interactive question prompts to enhance user-friendliness
