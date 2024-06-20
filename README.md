@@ -22,7 +22,6 @@ iMSminer Alpha
 ### **iMSminer**
 ```python
 pip install iMSminer
-import test
 ```
 ### **GPU-Accelerated Packages**
 #### [**Cupy**](https://docs.cupy.dev/en/stable/install.html)
