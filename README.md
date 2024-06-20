@@ -1,27 +1,27 @@
-iMSminer Beta
+iMSminer Alpha
 
 ## **Welcome to iMSminer!**
-**iMSminer** provides user-friendly, partial GPU- and compiler-accelerated multi-condition, multi-ROI, and multi-dataset preprocessing and mining of larger-than-memory imaging mass spectrometry datasets in Python.
+**iMSminer** provides user-friendly, partial GPU- or compiler-accelerated multi-condition, multi-ROI, and multi-dataset preprocessing and mining of larger-than-memory imaging mass spectrometry datasets in Python.
 
 ## **Portals**
 - **Quick Start**: https://drive.google.com/drive/folders/12Qjz5zlSMwL42W0X_yZxZVZaVXtlhylo?usp=drive_link 
 - **Tutorials and Documentation**: https://github.com/Prentice-lab-UF/iMSminer/blob/main/iMSminer/docs/_build/html/index.html (to be put on public domain)
-- **Support Group**: {insert Google support}
 - **Feedback Forms**: https://forms.gle/W7TwYy7NvewKvb5n8
 
 ## **Installation**
 ```
-PyPI installation instruction here
+pip install iMSminer
 ```
 
 ## **Features**
-- Interactive question prompting to enhance user-friendliness
-- Preprocesses imzML datasets with peak picking, mass alignment, and peak integration
+- Interactive question prompts to enhance user-friendliness
+- Preprocesses imzML datasets with peak picking, baseline subtraction, mass alignment, and peak integration
 - Enables interactive ROI annotation and selection
-- Optional data normalization, internal calibration, MS1 search, and analyte filtering
-- Unsupervised learning to cluster by molecular co-localization or *in situ* molecular profile
-- Univariate fold-change statistics with pairwise ROI comparisons
+- Optional data normalization, internal calibration, MS1 search, MS2 confirmation, and analyte filtering
+- Unsupervised learning to extract patterns based on molecular co-localization or *in situ* molecular profile
+- Univariate fold-change statistics with ROI comparisons
 - Visualiztion of ion image and ion statistics 
+
 
 ## **Citation**
 Please consider citing iMSminer and related modules if iMSminer is helpful to your work
