@@ -20,7 +20,7 @@ iMSminer Alpha
 
 ## **Installation (Local)**
 ### **iMSminer**
-```Python
+```python
 pip install iMSminer
 ```
 ### **GPU-Accelerated Packages**
