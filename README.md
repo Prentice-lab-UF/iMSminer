@@ -8,11 +8,11 @@
 
 ## **Features**
 - Interactive question prompts to enhance user-friendliness
-- Preprocesses imzML datasets with peak picking, baseline subtraction, mass alignment, and peak integration
-- Enables interactive ROI annotation and selection
+- Preprocesses imzML datasets via peak picking, baseline subtraction (optional), mass alignment (optional), and peak integration
+- Interactive ROI annotation and selection
 - Optional data normalization, internal calibration, MS1 search, MS2 confirmation, and analyte filtering
 - Unsupervised learning to extract patterns based on molecular co-localization or *in situ* molecular profile
-- Univariate fold-change statistics with ROI comparisons
+- Univariate fold-change statistics with ROI statistics
 - Visualiztion of ion image and ion statistics
 - Quickstart guides on Google Colab
 
