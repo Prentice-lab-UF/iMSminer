@@ -9,9 +9,11 @@ iMSminer Alpha
 - **Feedback Forms**: https://forms.gle/W7TwYy7NvewKvb5n8
 
 ## **Installation**
+### **iMSminer with CPU**
 ```
 pip install iMSminer
 ```
+
 
 ## **Features**
 - Interactive question prompts to enhance user-friendliness
