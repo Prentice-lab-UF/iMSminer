@@ -1,5 +1,3 @@
-iMSminer Alpha
-
 ## **Welcome to iMSminer!**
 **iMSminer** provides user-friendly, partially GPU- or compiler-accelerated multi-condition, multi-ROI, and multi-dataset preprocessing and mining of larger-than-memory imaging mass spectrometry datasets in Python.
 
@@ -16,7 +14,7 @@ iMSminer Alpha
 - Unsupervised learning to extract patterns based on molecular co-localization or *in situ* molecular profile
 - Univariate fold-change statistics with ROI comparisons
 - Visualiztion of ion image and ion statistics
-- Easily run on Google Colab
+- Quickstart guides on Google Colab
 
 ## **Installation (Local)**
 ### **iMSminer**
