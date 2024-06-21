@@ -7,7 +7,7 @@
 - [**Feedback Form**](https://forms.gle/C16Hrp9ibdtWgyH17)
 
 ## **Features**
-- Interactive question prompts to enhance user-friendliness
+- Interactive input prompts to enhance user-friendliness
 - Preprocesses imzML datasets via peak picking, baseline subtraction (optional), mass alignment (optional), and peak integration
 - Interactive ROI annotation and selection
 - Optional data normalization, internal calibration, MS1 search, MS2 confirmation, and analyte filtering
@@ -17,9 +17,9 @@
 - Quickstart guides on Google Colab
 
 ## **Installation (Local)**
-### **iMSminer**
+### **iMSminer** (imminent official PyPI release with preprint)
 ```python
-pip install iMSminer
+pip install -i https://test.pypi.org/simple/ iMSminer==0.2.0
 ```
 ### **GPU-Accelerated Packages**
 #### [**Cupy**](https://docs.cupy.dev/en/stable/install.html)
