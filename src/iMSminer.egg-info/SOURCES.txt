@@ -1,0 +1,16 @@
+LICENSE.txt
+MANIFEST.in
+README.md
+pyproject.toml
+setup.cfg
+setup.py
+src/iMSminer/ImzMLParser_chunk.py
+src/iMSminer/__init__.py
+src/iMSminer/data_analysis.py
+src/iMSminer/data_preprocessing.py
+src/iMSminer/utils.py
+src/iMSminer.egg-info/PKG-INFO
+src/iMSminer.egg-info/SOURCES.txt
+src/iMSminer.egg-info/dependency_links.txt
+src/iMSminer.egg-info/requires.txt
+src/iMSminer.egg-info/top_level.txt
