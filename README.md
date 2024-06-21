@@ -20,7 +20,7 @@
 ### **iMSminer** 
 Currently available on TestPyPI, PyPI release with preprint coming soon
 ```python
-pip install -i https://test.pypi.org/simple/ iMSminer==0.2.0
+pip install -i https://test.pypi.org/simple/ iMSminer==0.2.1
 ```
 ### **GPU-Accelerated Packages**
 #### [**Cupy**](https://docs.cupy.dev/en/stable/install.html)
