@@ -18,7 +18,7 @@
 
 ## **Installation (Local)**
 ### **iMSminer** 
-Currently available on TestPyPI; PyPI release with preprint coming soon
+Currently available on [TestPyPI](https://test.pypi.org/manage/project/iMSminer/release/0.2.2/); PyPI release with preprint coming soon
 ```python
 pip install -i https://test.pypi.org/simple/ iMSminer==0.2.2
 ```
