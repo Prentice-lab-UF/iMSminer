@@ -18,9 +18,9 @@
 
 ## **Installation (Local)**
 ### **iMSminer** 
-Currently available on TestPyPI, PyPI release with preprint coming soon
+Currently available on TestPyPI; PyPI release with preprint coming soon
 ```python
-pip install -i https://test.pypi.org/simple/ iMSminer==0.2.1
+pip install -i https://test.pypi.org/simple/ iMSminer==0.2.2
 ```
 ### **GPU-Accelerated Packages**
 #### [**Cupy**](https://docs.cupy.dev/en/stable/install.html)
