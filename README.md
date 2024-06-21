@@ -3,7 +3,7 @@
 
 ## **Resources**
 - [**Quick Start**](https://drive.google.com/drive/folders/12Qjz5zlSMwL42W0X_yZxZVZaVXtlhylo?usp=drive_link) 
-- [**Tutorials and Documentation**](https://github.com/Prentice-lab-UF/iMSminer/blob/main/iMSminer/docs/_build/html/index.html) 
+- [**Tutorials and Documentation**](https://prentice-lab-uf.github.io/iMSminer/)
 - [**Feedback Form**](https://forms.gle/C16Hrp9ibdtWgyH17)
 
 ## **Features**
