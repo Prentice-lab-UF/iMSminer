@@ -17,7 +17,8 @@
 - Quickstart guides on Google Colab
 
 ## **Installation (Local)**
-### **iMSminer** (imminent official PyPI release with preprint)
+### **iMSminer** 
+Currently available on TestPyPI, PyPI release with preprint coming soon
 ```python
 pip install -i https://test.pypi.org/simple/ iMSminer==0.2.0
 ```
