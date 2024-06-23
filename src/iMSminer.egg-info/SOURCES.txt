@@ -14,3 +14,12 @@ src/iMSminer.egg-info/SOURCES.txt
 src/iMSminer.egg-info/dependency_links.txt
 src/iMSminer.egg-info/requires.txt
 src/iMSminer.egg-info/top_level.txt
+src/iMSminer/__pycache__/ImzMLParser_chunk.cpython-310.pyc
+src/iMSminer/__pycache__/ImzMLParser_chunk.cpython-311.pyc
+src/iMSminer/__pycache__/__init__.cpython-310.pyc
+src/iMSminer/__pycache__/data_analysis.cpython-310.pyc
+src/iMSminer/__pycache__/data_analysis.cpython-311.pyc
+src/iMSminer/__pycache__/data_preprocessing.cpython-310.pyc
+src/iMSminer/__pycache__/data_preprocessing.cpython-311.pyc
+src/iMSminer/__pycache__/utils.cpython-310.pyc
+src/iMSminer/__pycache__/utils.cpython-311.pyc

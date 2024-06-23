@@ -5,7 +5,7 @@ from setuptools import find_packages, setup
 
 setuptools.setup(
     name="iMSminer",
-    version="0.2.1",
+    version="1.0.0",
     description="iMSminer provides user-friendly, partially GPU- or compiler-accelerated multi-condition, multi-ROI, and multi-dataset preprocessing and mining of larger-than-memory imaging mass spectrometry datasets in Python.",
     long_description=pathlib.Path("README.md").read_text(),
     long_description_content_type="text/markdown",

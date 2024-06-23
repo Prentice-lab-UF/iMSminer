@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>iMSminer.ImzMLParser_chunk &mdash; iMSminer  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/fonts.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            iMSminer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">iMSminer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">iMSminer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">iMSminer.ImzMLParser_chunk</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for iMSminer.ImzMLParser_chunk</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Copyright 2015 Dominik Fay</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1"># http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">bisect</span> <span class="kn">import</span> <span class="n">bisect_left</span><span class="p">,</span> <span class="n">bisect_right</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pyimzml.metadata</span> <span class="kn">import</span> <span class="n">Metadata</span><span class="p">,</span> <span class="n">SpectrumData</span>
+<span class="kn">from</span> <span class="nn">pyimzml.ontology.ontology</span> <span class="kn">import</span> <span class="n">convert_cv_param</span>
+
+<span class="n">PRECISION_DICT</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;32-bit float&quot;</span><span class="p">:</span> <span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="s2">&quot;64-bit float&quot;</span><span class="p">:</span> <span class="s1">&#39;d&#39;</span><span class="p">,</span>
+                  <span class="s2">&quot;32-bit integer&quot;</span><span class="p">:</span> <span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="s2">&quot;64-bit integer&quot;</span><span class="p">:</span> <span class="s1">&#39;l&#39;</span><span class="p">}</span>
+<span class="n">SIZE_DICT</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;f&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;i&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">}</span>
+<span class="n">INFER_IBD_FROM_IMZML</span> <span class="o">=</span> <span class="nb">object</span><span class="p">()</span>
+<span class="n">XMLNS_PREFIX</span> <span class="o">=</span> <span class="s2">&quot;{http://psi.hupo.org/ms/mzml}&quot;</span>
+
+<span class="n">param_group_elname</span> <span class="o">=</span> <span class="s2">&quot;referenceableParamGroup&quot;</span>
+<span class="n">data_processing_elname</span> <span class="o">=</span> <span class="s2">&quot;dataProcessing&quot;</span>
+<span class="n">instrument_confid_elname</span> <span class="o">=</span> <span class="s2">&quot;instrumentConfiguration&quot;</span>
+
+
+<div class="viewcode-block" id="choose_iterparse">
+<a class="viewcode-back" href="../../iMSminer.html#iMSminer.ImzMLParser_chunk.choose_iterparse">[docs]</a>
+<span class="k">def</span> <span class="nf">choose_iterparse</span><span class="p">(</span><span class="n">parse_lib</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">parse_lib</span> <span class="o">==</span> <span class="s1">&#39;ElementTree&#39;</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">xml.etree.ElementTree</span> <span class="kn">import</span> <span class="n">iterparse</span>
+    <span class="k">elif</span> <span class="n">parse_lib</span> <span class="o">==</span> <span class="s1">&#39;lxml&#39;</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">lxml.etree</span> <span class="kn">import</span> <span class="n">iterparse</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">xml.etree.ElementTree</span> <span class="kn">import</span> <span class="n">iterparse</span>
+    <span class="k">return</span> <span class="n">iterparse</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">_get_cv_param</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="n">accession</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">convert</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="s1">&#39;.//&#39;</span> <span class="k">if</span> <span class="n">deep</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">node</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">cvParam[@accession=&quot;</span><span class="si">%s</span><span class="s1">&quot;]&#39;</span> <span class="o">%</span>
+                     <span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">XMLNS_PREFIX</span><span class="p">,</span> <span class="n">accession</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">convert</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">convert_cv_param</span><span class="p">(</span><span class="n">accession</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ImzMLParser_chunk">
+<a class="viewcode-back" href="../../iMSminer.html#iMSminer.ImzMLParser_chunk.ImzMLParser_chunk">[docs]</a>
+<span class="k">class</span> <span class="nc">ImzMLParser_chunk</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parser for imzML 1.1.0 files (see specification here:</span>
+<span class="sd">    https://ms-imaging.org/wp-content/uploads/2009/08/specifications_imzML1.1.0_RC1.pdf ).</span>
+
+<span class="sd">    Iteratively reads the .imzML file into memory while pruning the per-spectrum metadata (everything in</span>
+<span class="sd">    &lt;spectrumList&gt; elements) during initialization. Returns a spectrum upon calling getspectrum(i). The binary file</span>
+<span class="sd">    is read in every call of getspectrum(i). Use enumerate(parser.coordinates) to get all coordinates with their</span>
+<span class="sd">    respective index. Coordinates are always 3-dimensional. If the third spatial dimension is not present in</span>
+<span class="sd">    the data, it will be set to zero.</span>
+
+<span class="sd">    The global metadata fields in the imzML file are stored in parser.metadata.</span>
+<span class="sd">    Spectrum-specific metadata fields are not stored by default due to avoid memory issues,</span>
+<span class="sd">    use the `include_spectra_metadata` parameter if spectrum-specific metadata is needed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">filename</span><span class="p">,</span>
+            <span class="n">parse_lib</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">ibd_file</span><span class="o">=</span><span class="n">INFER_IBD_FROM_IMZML</span><span class="p">,</span>
+            <span class="n">include_spectra_metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Opens the two files corresponding to the file name, reads the entire .imzML</span>
+<span class="sd">        file and extracts required attributes. Does not read any binary data, yet.</span>
+
+<span class="sd">        :param filename:</span>
+<span class="sd">            name of the XML file. Must end with .imzML. Binary data file must be named equally but ending with .ibd</span>
+<span class="sd">            Alternatively an open file or Buffer Protocol object can be supplied, if ibd_file is also supplied</span>
+<span class="sd">        :param parse_lib:</span>
+<span class="sd">            XML-parsing library to use: &#39;ElementTree&#39; or &#39;lxml&#39;, the later will be used if argument not provided</span>
+<span class="sd">        :param ibd_file:</span>
+<span class="sd">            File or Buffer Protocol object for the .ibd file. Leave blank to infer it from the imzml filename.</span>
+<span class="sd">            Set to None if no data from the .ibd file is needed (getspectrum calls will not work)</span>
+<span class="sd">        :param include_spectra_metadata:</span>
+<span class="sd">            None, &#39;full&#39;, or a list/set of accession IDs.</span>
+<span class="sd">            If &#39;full&#39; is given, parser.spectrum_full_metadata will be populated with a list of</span>
+<span class="sd">                complex objects containing the full metadata for each spectrum.</span>
+<span class="sd">            If a list or set is given, parser.spectrum_metadata_fields will be populated with a dict mapping</span>
+<span class="sd">                accession IDs to lists. Each list will contain the values for that accession ID for</span>
+<span class="sd">                each spectrum. Note that for performance reasons, this mode only searches the</span>
+<span class="sd">                spectrum itself for the value. It won&#39;t check any referenced referenceable param</span>
+<span class="sd">                groups if the accession ID isn&#39;t present in the spectrum metadata.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># ElementTree requires the schema location for finding tags (why?) but</span>
+        <span class="c1"># fails to read it from the root element. As this should be identical</span>
+        <span class="c1"># for all imzML files, it is hard-coded here and prepended before every tag</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sl</span> <span class="o">=</span> <span class="s2">&quot;{http://psi.hupo.org/ms/mzml}&quot;</span>
+        <span class="c1"># maps each imzML number format to its struct equivalent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">precisionDict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">PRECISION_DICT</span><span class="p">)</span>
+        <span class="c1"># maps each number format character to its amount of bytes used</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sizeDict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">SIZE_DICT</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mzOffsets</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">intensityOffsets</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mzLengths</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">intensityLengths</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># list of all (x,y,z) coordinates as tuples.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">polarity</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spectrum_mode</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">include_spectra_metadata</span> <span class="o">==</span> <span class="s1">&#39;full&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spectrum_full_metadata</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">elif</span> <span class="n">include_spectra_metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">include_spectra_metadata</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">include_spectra_metadata</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spectrum_metadata_fields</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">k</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">include_spectra_metadata</span>
+            <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mzGroupId</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">intGroupId</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mzPrecision</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">intensityPrecision</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iterparse</span> <span class="o">=</span> <span class="n">choose_iterparse</span><span class="p">(</span><span class="n">parse_lib</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__iter_read_spectrum_meta</span><span class="p">(</span><span class="n">include_spectra_metadata</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ibd_file</span> <span class="ow">is</span> <span class="n">INFER_IBD_FROM_IMZML</span><span class="p">:</span>
+            <span class="c1"># name of the binary file</span>
+            <span class="n">ibd_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_infer_bin_filename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ibd</span> <span class="o">=</span> <span class="n">ibd_filename</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">m</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">ibd_filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">m</span> <span class="o">=</span> <span class="n">ibd_file</span>
+
+        <span class="c1"># Dict for basic imzML metadata other than those required for reading</span>
+        <span class="c1"># spectra. See method __readimzmlmeta()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">imzmldict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__readimzmlmeta</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">imzmldict</span><span class="p">[</span><span class="s1">&#39;max count of pixels z&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span><span class="p">)[</span>
+            <span class="p">:,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_infer_bin_filename</span><span class="p">(</span><span class="n">imzml_path</span><span class="p">):</span>
+        <span class="n">imzml_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">imzml_path</span><span class="p">)</span>
+        <span class="n">ibd_path</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">imzml_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;.+\.ibd&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span> <span class="ow">and</span> <span class="n">f</span><span class="o">.</span><span class="n">stem</span> <span class="o">==</span> <span class="n">imzml_path</span><span class="o">.</span><span class="n">stem</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">ibd_path</span><span class="p">)</span>
+
+    <span class="c1"># system method for use of &#39;with ... as&#39;</span>
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="c1"># system method for use of &#39;with ... as&#39;</span>
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_t</span><span class="p">,</span> <span class="n">exc_v</span><span class="p">,</span> <span class="n">trace</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__iter_read_spectrum_meta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">include_spectra_metadata</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method should only be called by __init__. Reads the data formats, coordinates and offsets from</span>
+<span class="sd">        the .imzML file and initializes the respective attributes. While traversing the XML tree, the per-spectrum</span>
+<span class="sd">        metadata is pruned, i.e. the &lt;spectrumList&gt; element(s) are left behind empty.</span>
+
+<span class="sd">        Supported accession values for the number formats: &quot;MS:1000521&quot;, &quot;MS:1000523&quot;, &quot;IMS:1000141&quot; or</span>
+<span class="sd">        &quot;IMS:1000142&quot;. The string values are &quot;32-bit float&quot;, &quot;64-bit float&quot;, &quot;32-bit integer&quot;, &quot;64-bit integer&quot;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mz_group</span> <span class="o">=</span> <span class="n">int_group</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">slist</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">elem_iterator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterparse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,):</span>
+            <span class="n">_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">elem_iterator</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">elem_iterator</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+
+        <span class="n">is_first_spectrum</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">for</span> <span class="n">event</span><span class="p">,</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">elem_iterator</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">sl</span> <span class="o">+</span> <span class="s2">&quot;spectrumList&quot;</span> <span class="ow">and</span> <span class="n">event</span> <span class="o">==</span> <span class="s2">&quot;start&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__process_metadata</span><span class="p">()</span>
+                <span class="n">slist</span> <span class="o">=</span> <span class="n">elem</span>
+            <span class="k">elif</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">sl</span> <span class="o">+</span> <span class="s2">&quot;spectrum&quot;</span> <span class="ow">and</span> <span class="n">event</span> <span class="o">==</span> <span class="s2">&quot;end&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__process_spectrum</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="n">include_spectra_metadata</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">is_first_spectrum</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__read_polarity</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__read_spectrum_mode</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
+                    <span class="n">is_first_spectrum</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">slist</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__fix_offsets</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__fix_offsets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># convert signed 32-bit to 64-bit where appropriate</span>
+        <span class="k">def</span> <span class="nf">fix</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+            <span class="n">fixed</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">prev_value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;nan&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">array</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">prev_value</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">delta</span> <span class="o">+=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">32</span>
+                <span class="n">fixed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span> <span class="o">+</span> <span class="n">delta</span><span class="p">)</span>
+                <span class="n">prev_value</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">return</span> <span class="n">fixed</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mzOffsets</span> <span class="o">=</span> <span class="n">fix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mzOffsets</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">intensityOffsets</span> <span class="o">=</span> <span class="n">fix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">intensityOffsets</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__process_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">Metadata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">param_id</span><span class="p">,</span> <span class="n">param_group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">referenceable_param_groups</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="s1">&#39;m/z array&#39;</span> <span class="ow">in</span> <span class="n">param_group</span><span class="o">.</span><span class="n">param_by_name</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">mzGroupId</span> <span class="o">=</span> <span class="n">param_id</span>
+                    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">precisionDict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">param_group</span><span class="o">.</span><span class="n">param_by_name</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">mzPrecision</span> <span class="o">=</span> <span class="n">dtype</span>
+                <span class="k">if</span> <span class="s1">&#39;intensity array&#39;</span> <span class="ow">in</span> <span class="n">param_group</span><span class="o">.</span><span class="n">param_by_name</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">intGroupId</span> <span class="o">=</span> <span class="n">param_id</span>
+                    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">precisionDict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">param_group</span><span class="o">.</span><span class="n">param_by_name</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">intensityPrecision</span> <span class="o">=</span> <span class="n">dtype</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;mzPrecision&#39;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Could not determine m/z precision&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;intensityPrecision&#39;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Could not determine intensity precision&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__process_spectrum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elem</span><span class="p">,</span> <span class="n">include_spectra_metadata</span><span class="p">):</span>
+        <span class="n">arrlistelem</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">binaryDataArrayList&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">sl</span><span class="p">)</span>
+        <span class="n">mz_group</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">int_group</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">arrlistelem</span><span class="p">:</span>
+            <span class="n">ref</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">referenceableParamGroupRef&#39;</span> <span class="o">%</span>
+                         <span class="bp">self</span><span class="o">.</span><span class="n">sl</span><span class="p">)</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">ref</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">mzGroupId</span><span class="p">:</span>
+                <span class="n">mz_group</span> <span class="o">=</span> <span class="n">e</span>
+            <span class="k">elif</span> <span class="n">ref</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">intGroupId</span><span class="p">:</span>
+                <span class="n">int_group</span> <span class="o">=</span> <span class="n">e</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mzOffsets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">_get_cv_param</span><span class="p">(</span><span class="n">mz_group</span><span class="p">,</span> <span class="s1">&#39;IMS:1000102&#39;</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mzLengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">_get_cv_param</span><span class="p">(</span><span class="n">mz_group</span><span class="p">,</span> <span class="s1">&#39;IMS:1000103&#39;</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">intensityOffsets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">_get_cv_param</span><span class="p">(</span><span class="n">int_group</span><span class="p">,</span> <span class="s1">&#39;IMS:1000102&#39;</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">intensityLengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">_get_cv_param</span><span class="p">(</span><span class="n">int_group</span><span class="p">,</span> <span class="s1">&#39;IMS:1000103&#39;</span><span class="p">)))</span>
+        <span class="n">scan_elem</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">scanList/</span><span class="si">%s</span><span class="s1">scan&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sl</span><span class="p">))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">_get_cv_param</span><span class="p">(</span><span class="n">scan_elem</span><span class="p">,</span> <span class="s1">&#39;IMS:1000050&#39;</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">_get_cv_param</span><span class="p">(</span><span class="n">scan_elem</span><span class="p">,</span> <span class="s1">&#39;IMS:1000051&#39;</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">_get_cv_param</span><span class="p">(</span><span class="n">scan_elem</span><span class="p">,</span> <span class="s1">&#39;IMS:1000052&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">z</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">z</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">include_spectra_metadata</span> <span class="o">==</span> <span class="s1">&#39;full&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spectrum_full_metadata</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">SpectrumData</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">referenceable_param_groups</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">include_spectra_metadata</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">include_spectra_metadata</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">_get_cv_param</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">convert</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">spectrum_metadata_fields</span><span class="p">[</span><span class="n">param</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__read_polarity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elem</span><span class="p">):</span>
+        <span class="c1"># It&#39;s too slow to always check all spectra, so first check the referenceable_param_groups</span>
+        <span class="c1"># in the header to see if they indicate the polarity. If not, try to detect it from</span>
+        <span class="c1"># the first spectrum&#39;s full metadata.</span>
+        <span class="c1"># LIMITATION: This won&#39;t detect &quot;mixed&quot; polarity if polarity is only specified outside the</span>
+        <span class="c1"># referenceable_param_groups.</span>
+        <span class="n">param_groups</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">referenceable_param_groups</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        <span class="n">spectrum_metadata</span> <span class="o">=</span> <span class="n">SpectrumData</span><span class="p">(</span>
+            <span class="n">elem</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">referenceable_param_groups</span><span class="p">)</span>
+        <span class="n">has_positive</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">any</span><span class="p">(</span><span class="s1">&#39;positive scan&#39;</span> <span class="ow">in</span> <span class="n">group</span> <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">param_groups</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="s1">&#39;positive scan&#39;</span> <span class="ow">in</span> <span class="n">spectrum_metadata</span>
+        <span class="p">)</span>
+        <span class="n">has_negative</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">any</span><span class="p">(</span><span class="s1">&#39;negative scan&#39;</span> <span class="ow">in</span> <span class="n">group</span> <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">param_groups</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="s1">&#39;negative scan&#39;</span> <span class="ow">in</span> <span class="n">spectrum_metadata</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">has_positive</span> <span class="ow">and</span> <span class="n">has_negative</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">polarity</span> <span class="o">=</span> <span class="s1">&#39;mixed&#39;</span>
+        <span class="k">elif</span> <span class="n">has_positive</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">polarity</span> <span class="o">=</span> <span class="s1">&#39;positive&#39;</span>
+        <span class="k">elif</span> <span class="n">has_negative</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">polarity</span> <span class="o">=</span> <span class="s1">&#39;negative&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__read_spectrum_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elem</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method checks for centroid (MS:1000127) / profile (MS:1000128) mode information.</span>
+
+<span class="sd">        It&#39;s too slow to always check all spectra, so first check the referenceable_param_groups</span>
+<span class="sd">        in the header to see if they indicate the spectrum mode.</span>
+<span class="sd">        If not, try to detect it from the first spectrum&#39;s full metadata.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">param_groups</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">referenceable_param_groups</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        <span class="n">spectrum_metadata</span> <span class="o">=</span> <span class="n">SpectrumData</span><span class="p">(</span>
+            <span class="n">elem</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">referenceable_param_groups</span><span class="p">)</span>
+
+        <span class="n">profile_mode</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">any</span><span class="p">(</span><span class="s1">&#39;profile spectrum&#39;</span> <span class="ow">in</span> <span class="n">group</span> <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">param_groups</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="s1">&#39;profile spectrum&#39;</span> <span class="ow">in</span> <span class="n">spectrum_metadata</span>
+        <span class="p">)</span>
+        <span class="n">centroid_mode</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">any</span><span class="p">(</span><span class="s1">&#39;centroid spectrum&#39;</span> <span class="ow">in</span> <span class="n">group</span> <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">param_groups</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="s1">&#39;centroid spectrum&#39;</span> <span class="ow">in</span> <span class="n">spectrum_metadata</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">profile_mode</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spectrum_mode</span> <span class="o">=</span> <span class="s1">&#39;profile&#39;</span>
+        <span class="k">elif</span> <span class="n">centroid_mode</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spectrum_mode</span> <span class="o">=</span> <span class="s1">&#39;centroid&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__readimzmlmeta</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        DEPRECATED - use self.metadata instead, as it has much greater detail and allows for</span>
+<span class="sd">        multiple scan settings / instruments.</span>
+
+<span class="sd">        This method should only be called by __init__. Initializes the imzmldict with frequently used metadata from</span>
+<span class="sd">        the .imzML file.</span>
+
+<span class="sd">        :return d:</span>
+<span class="sd">            dict containing above mentioned meta data</span>
+<span class="sd">        :rtype:</span>
+<span class="sd">            dict</span>
+<span class="sd">        :raises Warning:</span>
+<span class="sd">            if an xml attribute has a number format different from the imzML specification</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">scan_settings_list_elem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
+            <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">scanSettingsList&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">sl</span><span class="p">)</span>
+        <span class="n">instrument_config_list_elem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
+            <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">instrumentConfigurationList&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">sl</span><span class="p">)</span>
+        <span class="n">scan_settings_params</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="s2">&quot;max count of pixels x&quot;</span><span class="p">,</span> <span class="s2">&quot;IMS:1000042&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;max count of pixels y&quot;</span><span class="p">,</span> <span class="s2">&quot;IMS:1000043&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;max dimension x&quot;</span><span class="p">,</span> <span class="s2">&quot;IMS:1000044&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;max dimension y&quot;</span><span class="p">,</span> <span class="s2">&quot;IMS:1000045&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;pixel size x&quot;</span><span class="p">,</span> <span class="s2">&quot;IMS:1000046&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;pixel size y&quot;</span><span class="p">,</span> <span class="s2">&quot;IMS:1000047&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;matrix solution concentration&quot;</span><span class="p">,</span> <span class="s2">&quot;MS:1000835&quot;</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="n">instrument_config_params</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="s2">&quot;wavelength&quot;</span><span class="p">,</span> <span class="s2">&quot;MS:1000843&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;focus diameter x&quot;</span><span class="p">,</span> <span class="s2">&quot;MS:1000844&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;focus diameter y&quot;</span><span class="p">,</span> <span class="s2">&quot;MS:1000845&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;pulse energy&quot;</span><span class="p">,</span> <span class="s2">&quot;MS:1000846&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;pulse duration&quot;</span><span class="p">,</span> <span class="s2">&quot;MS:1000847&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;attenuation&quot;</span><span class="p">,</span> <span class="s2">&quot;MS:1000848&quot;</span><span class="p">),</span>
+        <span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">accession</span> <span class="ow">in</span> <span class="n">scan_settings_params</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">_get_cv_param</span><span class="p">(</span><span class="n">scan_settings_list_elem</span><span class="p">,</span>
+                                    <span class="n">accession</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">convert</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">d</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">warn</span><span class="p">(</span><span class="ne">Warning</span><span class="p">(</span><span class="s1">&#39;Wrong data type in XML file. Skipped attribute &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">accession</span> <span class="ow">in</span> <span class="n">instrument_config_params</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">_get_cv_param</span><span class="p">(</span><span class="n">instrument_config_list_elem</span><span class="p">,</span>
+                                    <span class="n">accession</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">convert</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">d</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">warn</span><span class="p">(</span><span class="ne">Warning</span><span class="p">(</span><span class="s1">&#39;Wrong data type in XML file. Skipped attribute &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">d</span>
+
+<div class="viewcode-block" id="ImzMLParser_chunk.get_physical_coordinates">
+<a class="viewcode-back" href="../../iMSminer.html#iMSminer.ImzMLParser_chunk.ImzMLParser_chunk.get_physical_coordinates">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_physical_coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        For a pixel index i, return the real-world coordinates in nanometers.</span>
+
+<span class="sd">        This is equivalent to multiplying the image coordinates of the given pixel with the pixel size.</span>
+
+<span class="sd">        :param i: the pixel index</span>
+<span class="sd">        :return: a tuple of x and y coordinates.</span>
+<span class="sd">        :rtype: Tuple[float]</span>
+<span class="sd">        :raises KeyError: if the .imzML file does not specify the attributes &quot;pixel size x&quot; and &quot;pixel size y&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">pixel_size_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">imzmldict</span><span class="p">[</span><span class="s2">&quot;pixel size x&quot;</span><span class="p">]</span>
+            <span class="n">pixel_size_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">imzmldict</span><span class="p">[</span><span class="s2">&quot;pixel size y&quot;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+                <span class="s2">&quot;Could not find all pixel size attributes in imzML file&quot;</span><span class="p">)</span>
+        <span class="n">image_x</span><span class="p">,</span> <span class="n">image_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span><span class="p">[</span><span class="n">i</span><span class="p">][:</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">image_x</span> <span class="o">*</span> <span class="n">pixel_size_x</span><span class="p">,</span> <span class="n">image_y</span> <span class="o">*</span> <span class="n">pixel_size_y</span></div>
+
+
+<div class="viewcode-block" id="ImzMLParser_chunk.getmz">
+<a class="viewcode-back" href="../../iMSminer.html#iMSminer.ImzMLParser_chunk.ImzMLParser_chunk.getmz">[docs]</a>
+    <span class="k">def</span> <span class="nf">getmz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reads the spectrum at specified index from the .ibd file.</span>
+
+<span class="sd">        :param index:</span>
+<span class="sd">            Index of the desired spectrum in the .imzML file</span>
+
+<span class="sd">        Output:</span>
+
+<span class="sd">        mz_array: numpy.ndarray</span>
+<span class="sd">            Sequence of m/z values representing the horizontal axis of the desired mass</span>
+<span class="sd">            spectrum</span>
+<span class="sd">        intensity_array: numpy.ndarray</span>
+<span class="sd">            Sequence of intensity values corresponding to mz_array</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mz_bytes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_mz_as_string</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">mz_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">mz_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mzPrecision</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">mz_array</span></div>
+
+
+<div class="viewcode-block" id="ImzMLParser_chunk.get_intensity_chunk">
+<a class="viewcode-back" href="../../iMSminer.html#iMSminer.ImzMLParser_chunk.ImzMLParser_chunk.get_intensity_chunk">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_intensity_chunk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk_start</span><span class="p">,</span> <span class="n">chunk_end</span><span class="p">,</span> <span class="n">index_stop</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reads the spectrum at specified index from the .ibd file.</span>
+
+<span class="sd">        :param index:</span>
+<span class="sd">            Index of the desired spectrum in the .imzML file</span>
+
+<span class="sd">        Output:</span>
+
+<span class="sd">        mz_array: numpy.ndarray</span>
+<span class="sd">            Sequence of m/z values representing the horizontal axis of the desired mass</span>
+<span class="sd">            spectrum</span>
+<span class="sd">        intensity_array: numpy.ndarray</span>
+<span class="sd">            Sequence of intensity values corresponding to mz_array</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">intensity_array</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_intensity_as_string</span><span class="p">(</span><span class="n">index</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">intensityPrecision</span><span class="p">)[</span>
+            <span class="p">:</span><span class="n">index_stop</span><span class="p">]</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">chunk_start</span><span class="p">,</span> <span class="n">chunk_end</span><span class="p">)]</span>
+        <span class="n">intensity_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">intensity_array</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">intensity_array</span></div>
+
+
+<div class="viewcode-block" id="ImzMLParser_chunk.process_intensity">
+<a class="viewcode-back" href="../../iMSminer.html#iMSminer.ImzMLParser_chunk.ImzMLParser_chunk.process_intensity">[docs]</a>
+    <span class="k">def</span> <span class="nf">process_intensity</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span> <span class="n">size_dict</span><span class="p">):</span>
+        <span class="c1"># Calculate the actual length needed to read from the file</span>
+        <span class="n">actual_length</span> <span class="o">=</span> <span class="n">length</span> <span class="o">*</span> <span class="n">size_dict</span><span class="p">[</span><span class="n">precision</span><span class="p">]</span>
+        <span class="c1"># Open the file and read the specified segment</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">file</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">actual_length</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">precision</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ImzMLParser_chunk.parallel_get_intensity_chunk">
+<a class="viewcode-back" href="../../iMSminer.html#iMSminer.ImzMLParser_chunk.ImzMLParser_chunk.parallel_get_intensity_chunk">[docs]</a>
+    <span class="k">def</span> <span class="nf">parallel_get_intensity_chunk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk_start</span><span class="p">,</span> <span class="n">chunk_end</span><span class="p">):</span>
+        <span class="c1"># Prepare tasks</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">process_intensity</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ibd</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">intensityOffsets</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">intensityLengths</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">intensityPrecision</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sizeDict</span>
+        <span class="p">)</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">chunk_start</span><span class="p">,</span> <span class="n">chunk_end</span><span class="p">)]</span>
+
+        <span class="c1"># Collect results</span>
+        <span class="n">intensity_arrays</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">intensity_arrays</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ImzMLParser_chunk.get_mz_as_string">
+<a class="viewcode-back" href="../../iMSminer.html#iMSminer.ImzMLParser_chunk.ImzMLParser_chunk.get_mz_as_string">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_mz_as_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reads m/z array and intensity array of the spectrum at specified location</span>
+<span class="sd">        from the binary file as a byte string. The string can be unpacked by the struct</span>
+<span class="sd">        module. To get the arrays as numbers, use getspectrum</span>
+
+<span class="sd">        :param index:</span>
+<span class="sd">            Index of the desired spectrum in the .imzML file</span>
+<span class="sd">        :rtype: Tuple[str, str]</span>
+
+<span class="sd">        Output:</span>
+
+<span class="sd">        mz_string:</span>
+<span class="sd">            string where each character represents a byte of the mz array of the</span>
+<span class="sd">            spectrum</span>
+<span class="sd">        intensity_string:</span>
+<span class="sd">            string where each character represents a byte of the intensity array of</span>
+<span class="sd">            the spectrum</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">offsets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mzOffsets</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="n">lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mzLengths</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="n">lengths</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sizeDict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mzPrecision</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">offsets</span><span class="p">)</span>
+        <span class="n">mz_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">mz_string</span></div>
+
+
+<div class="viewcode-block" id="ImzMLParser_chunk.get_intensity_as_string">
+<a class="viewcode-back" href="../../iMSminer.html#iMSminer.ImzMLParser_chunk.ImzMLParser_chunk.get_intensity_as_string">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_intensity_as_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reads m/z array and intensity array of the spectrum at specified location</span>
+<span class="sd">        from the binary file as a byte string. The string can be unpacked by the struct</span>
+<span class="sd">        module. To get the arrays as numbers, use getspectrum</span>
+
+<span class="sd">        :param index:</span>
+<span class="sd">            Index of the desired spectrum in the .imzML file</span>
+<span class="sd">        :rtype: Tuple[str, str]</span>
+
+<span class="sd">        Output:</span>
+
+<span class="sd">        mz_string:</span>
+<span class="sd">            string where each character represents a byte of the mz array of the</span>
+<span class="sd">            spectrum</span>
+<span class="sd">        intensity_string:</span>
+<span class="sd">            string where each character represents a byte of the intensity array of</span>
+<span class="sd">            the spectrum</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">offsets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">intensityOffsets</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="n">lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">intensityLengths</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="n">lengths</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sizeDict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">intensityPrecision</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">offsets</span><span class="p">)</span>
+        <span class="n">intensity_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">intensity_string</span></div>
+
+
+<div class="viewcode-block" id="ImzMLParser_chunk.portable_spectrum_reader">
+<a class="viewcode-back" href="../../iMSminer.html#iMSminer.ImzMLParser_chunk.ImzMLParser_chunk.portable_spectrum_reader">[docs]</a>
+    <span class="k">def</span> <span class="nf">portable_spectrum_reader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Builds a PortableSpectrumReader that holds the coordinates list and spectrum offsets in the .ibd file</span>
+<span class="sd">        so that the .ibd file can be read without opening the .imzML file again.</span>
+
+<span class="sd">        The PortableSpectrumReader can be safely pickled and unpickled, making it useful for reading the spectra</span>
+<span class="sd">        in a distributed environment such as PySpark or PyWren.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">PortableSpectrumReader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span><span class="p">,</span>
+                                      <span class="bp">self</span><span class="o">.</span><span class="n">mzPrecision</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mzOffsets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mzLengths</span><span class="p">,</span>
+                                      <span class="bp">self</span><span class="o">.</span><span class="n">intensityPrecision</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">intensityOffsets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">intensityLengths</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="getionimage">
+<a class="viewcode-back" href="../../iMSminer.html#iMSminer.ImzMLParser_chunk.getionimage">[docs]</a>
+<span class="k">def</span> <span class="nf">getionimage</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">mz_value</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">reduce_func</span><span class="o">=</span><span class="nb">sum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get an image representation of the intensity distribution</span>
+<span class="sd">    of the ion with specified m/z value.</span>
+
+<span class="sd">    By default, the intensity values within the tolerance region are summed.</span>
+
+<span class="sd">    :param p:</span>
+<span class="sd">        the ImzMLParser (or anything else with similar attributes) for the desired dataset</span>
+<span class="sd">    :param mz_value:</span>
+<span class="sd">        m/z value for which the ion image shall be returned</span>
+<span class="sd">    :param tol:</span>
+<span class="sd">        Absolute tolerance for the m/z value, such that all ions with values</span>
+<span class="sd">        mz_value-|tol| &lt;= x &lt;= mz_value+|tol| are included. Defaults to 0.1</span>
+<span class="sd">    :param z:</span>
+<span class="sd">        z Value if spectrogram is 3-dimensional.</span>
+<span class="sd">    :param reduce_func:</span>
+<span class="sd">        the bahaviour for reducing the intensities between mz_value-|tol| and mz_value+|tol| to a single value. Must</span>
+<span class="sd">        be a function that takes a sequence as input and outputs a number. By default, the values are summed.</span>
+
+<span class="sd">    :return:</span>
+<span class="sd">        numpy matrix with each element representing the ion intensity in this</span>
+<span class="sd">        pixel. Can be easily plotted with matplotlib</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tol</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">tol</span><span class="p">)</span>
+    <span class="n">im</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">p</span><span class="o">.</span><span class="n">imzmldict</span><span class="p">[</span><span class="s2">&quot;max count of pixels y&quot;</span><span class="p">],</span>
+                  <span class="n">p</span><span class="o">.</span><span class="n">imzmldict</span><span class="p">[</span><span class="s2">&quot;max count of pixels x&quot;</span><span class="p">]))</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z_</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">coordinates</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">z_</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="ne">UserWarning</span><span class="p">(</span>
+                <span class="s2">&quot;z coordinate = 0 present, if you&#39;re getting blank images set getionimage(.., .., z=0)&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">z_</span> <span class="o">==</span> <span class="n">z</span><span class="p">:</span>
+            <span class="n">mzs</span><span class="p">,</span> <span class="n">ints</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">p</span><span class="o">.</span><span class="n">getspectrum</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+            <span class="n">min_i</span><span class="p">,</span> <span class="n">max_i</span> <span class="o">=</span> <span class="n">_bisect_spectrum</span><span class="p">(</span><span class="n">mzs</span><span class="p">,</span> <span class="n">mz_value</span><span class="p">,</span> <span class="n">tol</span><span class="p">)</span>
+            <span class="n">im</span><span class="p">[</span><span class="n">y</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">reduce_func</span><span class="p">(</span><span class="n">ints</span><span class="p">[</span><span class="n">min_i</span><span class="p">:</span><span class="n">max_i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">im</span></div>
+
+
+
+<div class="viewcode-block" id="browse">
+<a class="viewcode-back" href="../../iMSminer.html#iMSminer.ImzMLParser_chunk.browse">[docs]</a>
+<span class="k">def</span> <span class="nf">browse</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a per-spectrum metadata browser for the parser.</span>
+<span class="sd">    Usage::</span>
+
+<span class="sd">        # get a list of the instrument configurations used in the first pixel</span>
+<span class="sd">        instrument_configurations = browse(p).for_spectrum(0).get_ids(&quot;instrumentConfiguration&quot;)</span>
+
+<span class="sd">    Currently, ``instrumentConfiguration``, ``dataProcessing`` and ``referenceableParamGroup`` are supported.</span>
+
+<span class="sd">    For browsing all spectra iteratively, you should by all means use **ascending** indices. Doing otherwise can result</span>
+<span class="sd">    in quadratic runtime. The following example shows how to retrieve all unique instrumentConfigurations used::</span>
+
+<span class="sd">        browser = browse(p)</span>
+<span class="sd">        all_config_ids = set()</span>
+<span class="sd">        for i, _ in enumerate(p.coordinates):</span>
+<span class="sd">            all_config_ids.update(browser.for_spectrum(i).get_ids(&quot;instrumentConfiguration&quot;))</span>
+
+<span class="sd">    This is a list of ids with which you can find the corresponding ``&lt;instrumentConfiguration&gt;`` tag in the xml tree.</span>
+
+<span class="sd">    :param p: the parser</span>
+<span class="sd">    :return: the browser</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_ImzMLMetaDataBrowser</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">sl</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">_bisect_spectrum</span><span class="p">(</span><span class="n">mzs</span><span class="p">,</span> <span class="n">mz_value</span><span class="p">,</span> <span class="n">tol</span><span class="p">):</span>
+    <span class="n">ix_l</span><span class="p">,</span> <span class="n">ix_u</span> <span class="o">=</span> <span class="n">bisect_left</span><span class="p">(</span>
+        <span class="n">mzs</span><span class="p">,</span> <span class="n">mz_value</span> <span class="o">-</span> <span class="n">tol</span><span class="p">),</span> <span class="n">bisect_right</span><span class="p">(</span><span class="n">mzs</span><span class="p">,</span> <span class="n">mz_value</span> <span class="o">+</span> <span class="n">tol</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">ix_l</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">mzs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">mzs</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">mzs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ix_u</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">ix_u</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">mzs</span><span class="p">):</span>
+        <span class="n">ix_u</span> <span class="o">-=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">mzs</span><span class="p">[</span><span class="n">ix_l</span><span class="p">]</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">mz_value</span> <span class="o">-</span> <span class="n">tol</span><span class="p">):</span>
+        <span class="n">ix_l</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">mzs</span><span class="p">[</span><span class="n">ix_u</span><span class="p">]</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">mz_value</span> <span class="o">+</span> <span class="n">tol</span><span class="p">):</span>
+        <span class="n">ix_u</span> <span class="o">-=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">ix_l</span><span class="p">,</span> <span class="n">ix_u</span>
+
+
+<span class="k">class</span> <span class="nc">_ImzMLMetaDataBrowser</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">sl</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="o">=</span> <span class="n">root</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sl</span> <span class="o">=</span> <span class="n">sl</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fn</span> <span class="o">=</span> <span class="n">fn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_iter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_previous</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list_elem</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iterparse</span> <span class="o">=</span> <span class="n">choose_iterparse</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">for_spectrum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_previous</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_previous</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_iter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterparse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fn</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">event</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iter</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sl</span> <span class="o">+</span> <span class="s2">&quot;spectrumList&quot;</span> <span class="ow">and</span> <span class="n">event</span> <span class="o">==</span> <span class="s2">&quot;start&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_list_elem</span> <span class="o">=</span> <span class="n">s</span>
+            <span class="k">elif</span> <span class="n">s</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sl</span> <span class="o">+</span> <span class="s2">&quot;spectrum&quot;</span> <span class="ow">and</span> <span class="n">event</span> <span class="o">==</span> <span class="s2">&quot;end&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_list_elem</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_previous</span> <span class="o">=</span> <span class="n">i</span>
+                    <span class="k">return</span> <span class="n">_SpectrumMetaDataBrowser</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sl</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">_SpectrumMetaDataBrowser</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">sl</span><span class="p">,</span> <span class="n">spectrum</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="o">=</span> <span class="n">root</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sl</span> <span class="o">=</span> <span class="n">sl</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spectrum</span> <span class="o">=</span> <span class="n">spectrum</span>
+
+    <span class="k">def</span> <span class="nf">get_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">):</span>
+        <span class="n">param_methods</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">param_group_elname</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_referenceable_param_groups</span><span class="p">,</span>
+            <span class="n">data_processing_elname</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_data_processing</span><span class="p">,</span>
+            <span class="n">instrument_confid_elname</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_instrument_configurations</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">param_methods</span><span class="p">[</span><span class="n">element</span><span class="p">]()</span>
+        <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported element: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">element</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_find_referenceable_param_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">param_group_refs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spectrum</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">referenceableParamGroupRef&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sl</span><span class="p">)</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">g</span><span class="p">:</span> <span class="n">g</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;ref&quot;</span><span class="p">],</span> <span class="n">param_group_refs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ids</span>
+
+    <span class="k">def</span> <span class="nf">_find_instrument_configurations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">scan_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spectrum</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">scanList&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sl</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">scan_list</span><span class="p">:</span>
+            <span class="n">scans</span> <span class="o">=</span> <span class="n">scan_list</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span>
+                <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">scan[@instrumentConfigurationRef]&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sl</span><span class="p">)</span>
+            <span class="n">ids</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;instrumentConfigurationRef&quot;</span><span class="p">],</span> <span class="n">scans</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ids</span><span class="p">:</span>
+            <span class="n">run</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">run&quot;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">run</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;defaultInstrumentConfigurationRef&quot;</span><span class="p">]]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">_</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ids</span>
+
+    <span class="k">def</span> <span class="nf">_find_data_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spectrum</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;dataProcessingRef&quot;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">_</span><span class="p">:</span>
+            <span class="n">spectrum_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
+                <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">run/</span><span class="si">%s</span><span class="s2">spectrumList&quot;</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_sl</span><span class="p">]))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">spectrum_list</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;defaultDataProcessingRef&quot;</span><span class="p">]]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">_</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">[]</span>
+
+
+<div class="viewcode-block" id="PortableSpectrumReader">
+<a class="viewcode-back" href="../../iMSminer.html#iMSminer.ImzMLParser_chunk.PortableSpectrumReader">[docs]</a>
+<span class="k">class</span> <span class="nc">PortableSpectrumReader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A pickle-able class for holding the minimal set of data required for reading,</span>
+<span class="sd">    without holding any references to open files that wouldn&#39;t survive pickling.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coordinates</span><span class="p">,</span> <span class="n">mzPrecision</span><span class="p">,</span> <span class="n">mzOffsets</span><span class="p">,</span> <span class="n">mzLengths</span><span class="p">,</span>
+                 <span class="n">intensityPrecision</span><span class="p">,</span> <span class="n">intensityOffsets</span><span class="p">,</span> <span class="n">intensityLengths</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">coordinates</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mzPrecision</span> <span class="o">=</span> <span class="n">mzPrecision</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mzOffsets</span> <span class="o">=</span> <span class="n">mzOffsets</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mzLengths</span> <span class="o">=</span> <span class="n">mzLengths</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">intensityPrecision</span> <span class="o">=</span> <span class="n">intensityPrecision</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">intensityOffsets</span> <span class="o">=</span> <span class="n">intensityOffsets</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">intensityLengths</span> <span class="o">=</span> <span class="n">intensityLengths</span>
+
+<div class="viewcode-block" id="PortableSpectrumReader.read_spectrum_from_file">
+<a class="viewcode-back" href="../../iMSminer.html#iMSminer.ImzMLParser_chunk.PortableSpectrumReader.read_spectrum_from_file">[docs]</a>
+    <span class="k">def</span> <span class="nf">read_spectrum_from_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reads the spectrum at specified index from the .ibd file.</span>
+
+<span class="sd">        :param file:</span>
+<span class="sd">            File or file-like object for the .ibd file</span>
+<span class="sd">        :param index:</span>
+<span class="sd">            Index of the desired spectrum in the .imzML file</span>
+
+<span class="sd">        Output:</span>
+
+<span class="sd">        mz_array: numpy.ndarray</span>
+<span class="sd">            Sequence of m/z values representing the horizontal axis of the desired mass</span>
+<span class="sd">            spectrum</span>
+<span class="sd">        intensity_array: numpy.ndarray</span>
+<span class="sd">            Sequence of intensity values corresponding to mz_array</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mzOffsets</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+        <span class="n">mz_bytes</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mzLengths</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">*</span> <span class="n">SIZE_DICT</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mzPrecision</span><span class="p">])</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">intensityOffsets</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+        <span class="n">intensity_bytes</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">intensityLengths</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">*</span> <span class="n">SIZE_DICT</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">intensityPrecision</span><span class="p">])</span>
+
+        <span class="n">mz_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">mz_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mzPrecision</span><span class="p">)</span>
+        <span class="n">intensity_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span>
+            <span class="n">intensity_bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">intensityPrecision</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">mz_array</span><span class="p">,</span> <span class="n">intensity_array</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Yu Tin Lin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

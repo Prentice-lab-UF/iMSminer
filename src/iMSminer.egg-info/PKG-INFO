@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: iMSminer
-Version: 0.2.1
+Version: 1.0.0
 Summary: iMSminer provides user-friendly, partially GPU- or compiler-accelerated multi-condition, multi-ROI, and multi-dataset preprocessing and mining of larger-than-memory imaging mass spectrometry datasets in Python.
 Home-page: https://github.com/Prentice-lab-UF/iMSminer
 Author: Yu Tin Lin
@@ -33,11 +33,11 @@ Requires-Dist: statannotations>=0.6.0
 
 ## **Resources**
 - [**Quick Start**](https://drive.google.com/drive/folders/12Qjz5zlSMwL42W0X_yZxZVZaVXtlhylo?usp=drive_link) 
-- [**Tutorials and Documentation**](https://github.com/Prentice-lab-UF/iMSminer/blob/main/iMSminer/docs/_build/html/index.html) 
+- [**Tutorials and Documentation**](https://prentice-lab-uf.github.io/iMSminer/)
 - [**Feedback Form**](https://forms.gle/C16Hrp9ibdtWgyH17)
 
 ## **Features**
-- Interactive question prompts to enhance user-friendliness
+- Interactive input prompts to enhance user-friendliness
 - Preprocesses imzML datasets via peak picking, baseline subtraction (optional), mass alignment (optional), and peak integration
 - Interactive ROI annotation and selection
 - Optional data normalization, internal calibration, MS1 search, MS2 confirmation, and analyte filtering
@@ -47,9 +47,10 @@ Requires-Dist: statannotations>=0.6.0
 - Quickstart guides on Google Colab
 
 ## **Installation (Local)**
-### **iMSminer**
+### **iMSminer** 
+Currently available on [TestPyPI](https://test.pypi.org/manage/project/iMSminer/release/0.2.2/); PyPI release with preprint coming soon
 ```python
-pip install iMSminer
+pip install -i https://test.pypi.org/simple/ iMSminer==0.2.2
 ```
 ### **GPU-Accelerated Packages**
 #### [**Cupy**](https://docs.cupy.dev/en/stable/install.html)
