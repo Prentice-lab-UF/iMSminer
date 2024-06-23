@@ -44,20 +44,6 @@ except:
 
 # ========================DATA PROCESSING========================#
 
-# def prompt_for_attributes(prompt_func):
-#     """
-#     Decorator for question prompts
-#     """
-#     def decorator(method):
-#         def wrapper(self, *args, **kwargs):
-#             attributes = method(self, *args, **kwargs)
-#             for attr_name, prompt in attributes.items():
-#                 if not hasattr(self, attr_name):
-#                     setattr(self, attr_name, prompt())
-#             return method(self, *args, **kwargs)
-#         return wrapper
-#     return decorator
-
 
 def prompt_for_attributes(prompt_func):
     """
@@ -389,7 +375,7 @@ class Preprocess:
 
                 if remainder > i:
                     chunk_size_temp += 1
-                print(f"chunk: {i} of {num_chunks}; \n"
+                print(f"chunk: {i+1} of {num_chunks}; \n"
                       f"chunck_size: {chunk_size_temp} of {num_spectra}")
                 if i != 0:
                     chunk_start += previous_chunk_size
@@ -558,7 +544,7 @@ class Preprocess:
                     noise_array += noise_chunk
 
                     print(
-                        f"Time used for running chunk {i} with a size of \n"
+                        f"Time used for running chunk {i+1} with a size of \n"
                         f"{chunk_size_temp}: {time.time()-start_time}"
                     )
                 gc.collect()
@@ -634,15 +620,17 @@ class Preprocess:
                             self.p, n_bins, self.percent_RAM)
                     )
                     previous_chunk_size = 0
+                    num_spectra = len(self.p.coordinates)
                     for i in range(num_chunks):
                         chunk_size_temp = chunk_size_base
 
                         if remainder > i:
                             chunk_size_temp += 1
-                        print(f"I: {i}; chunck_size: {chunk_size_temp}")
+
                         if i != 0:
                             chunk_start += previous_chunk_size
-                        print(f"chunk_start: {chunk_start}")
+                        print(f"chunk: {i+1} of {num_chunks}; \n"
+                              f"chunck_size: {chunk_size_temp} of {num_spectra}")
 
                         chunk_ms_dict = get_chunk_ms_info_inhomogeneous(
                             self.p,
