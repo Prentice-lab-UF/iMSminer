@@ -734,7 +734,7 @@ class DataAnalysis:
         jitter_factor : float, optional
             Controls the repulsiveness of neighboring feature labels, by deafult 100
         font_size : float, optional
-            Font size of feature labels in volcano plot
+            Font size of feature labels in volcano plot, by default 15
         get_hm : bool, optional
             Renders a heatmap of feature label by ROI with entries fold change if `get_hm = True`, by deafult True
         hm_width_factor : float, optional
@@ -1328,11 +1328,11 @@ class DataAnalysis:
             insitu_perplexity: float = 15,
             zoom: float = 0.1,
             quantile: float = 100,
-            img_plot_method: str = "plot_img",
+            img_plot_method: str = "plot_ROI",
             feature_label="mz",
             jitter_amount: float = 2,
             jitter_factor: float = 100,
-            font_size: float = 5,
+            font_size: float = 15,
             ROI_linewidth: float = 3,
             ROI_size_divisor: float = 8
     ):
@@ -1357,14 +1357,18 @@ class DataAnalysis:
             Relative size of ion images in t-SNE embedding to the embedding. The default is 0.1.
         quantile : TYPE, optional
             Maximum intensity quantile cutoff for ion image visualization. The default is 100.
+        img_plot_method: str, optional
+            Controls layout of rendered in situ heatmaps
+            Method `plot_img` retains all coordinates from imaging mass spectrometry experiment
+            Method `plot_ROI` renders heatmaps of ROIs 
         jitter_amount : float, optional
             Controls placement of feature labels in t-SNE embedding of ion images, by default 2
         jitter_factor : float, optional
             Controls the repulsiveness of neighboring feature labels in t-SNE embedding of ion images, by deafult 100
         font_size : float, optional
-            Font size of feature labels in volcano plot
+            Font size of feature labels in volcano plot, by default 15
         ROI_line_width : float, optional
-            Controls width of green box surrounding ROIs
+            Controls width of green box surrounding ROIs, by default 3
         ROI_size_divisor : float, optional
             Controls size of ROI labels, where a smaller divisor gives a larger ROI label, by default 8
         """
