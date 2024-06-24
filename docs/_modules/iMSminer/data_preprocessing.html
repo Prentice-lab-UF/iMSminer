@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iMSminer.data_preprocessing &mdash; iMSminer  documentation</title>
+  <title>iMSminer.data_preprocessing &mdash; iMSminer 1.0.1 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
@@ -14,7 +14,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/documentation_options.js?v=292eb321"></script>
         <script src="../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -43,6 +43,8 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../modules.html">iMSminer</a></li>
 </ul>
 
@@ -116,20 +118,6 @@
 
 
 <span class="c1"># ========================DATA PROCESSING========================#</span>
-
-<span class="c1"># def prompt_for_attributes(prompt_func):</span>
-<span class="c1">#     &quot;&quot;&quot;</span>
-<span class="c1">#     Decorator for question prompts</span>
-<span class="c1">#     &quot;&quot;&quot;</span>
-<span class="c1">#     def decorator(method):</span>
-<span class="c1">#         def wrapper(self, *args, **kwargs):</span>
-<span class="c1">#             attributes = method(self, *args, **kwargs)</span>
-<span class="c1">#             for attr_name, prompt in attributes.items():</span>
-<span class="c1">#                 if not hasattr(self, attr_name):</span>
-<span class="c1">#                     setattr(self, attr_name, prompt())</span>
-<span class="c1">#             return method(self, *args, **kwargs)</span>
-<span class="c1">#         return wrapper</span>
-<span class="c1">#     return decorator</span>
 
 
 <div class="viewcode-block" id="prompt_for_attributes">
@@ -478,7 +466,7 @@
 
                 <span class="k">if</span> <span class="n">remainder</span> <span class="o">&gt;</span> <span class="n">i</span><span class="p">:</span>
                     <span class="n">chunk_size_temp</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;chunk: </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="n">num_chunks</span><span class="si">}</span><span class="s2">; </span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;chunk: </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="n">num_chunks</span><span class="si">}</span><span class="s2">; </span><span class="se">\n</span><span class="s2">&quot;</span>
                       <span class="sa">f</span><span class="s2">&quot;chunck_size: </span><span class="si">{</span><span class="n">chunk_size_temp</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="n">num_spectra</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">chunk_start</span> <span class="o">+=</span> <span class="n">previous_chunk_size</span>
@@ -650,7 +638,7 @@
                     <span class="n">noise_array</span> <span class="o">+=</span> <span class="n">noise_chunk</span>
 
                     <span class="nb">print</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;Time used for running chunk </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> with a size of </span><span class="se">\n</span><span class="s2">&quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;Time used for running chunk </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> with a size of </span><span class="se">\n</span><span class="s2">&quot;</span>
                         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">chunk_size_temp</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">start_time</span><span class="si">}</span><span class="s2">&quot;</span>
                     <span class="p">)</span>
                 <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
@@ -726,15 +714,17 @@
                             <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">percent_RAM</span><span class="p">)</span>
                     <span class="p">)</span>
                     <span class="n">previous_chunk_size</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">num_spectra</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">coordinates</span><span class="p">)</span>
                     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_chunks</span><span class="p">):</span>
                         <span class="n">chunk_size_temp</span> <span class="o">=</span> <span class="n">chunk_size_base</span>
 
                         <span class="k">if</span> <span class="n">remainder</span> <span class="o">&gt;</span> <span class="n">i</span><span class="p">:</span>
                             <span class="n">chunk_size_temp</span> <span class="o">+=</span> <span class="mi">1</span>
-                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;I: </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">; chunck_size: </span><span class="si">{</span><span class="n">chunk_size_temp</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
                         <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
                             <span class="n">chunk_start</span> <span class="o">+=</span> <span class="n">previous_chunk_size</span>
-                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;chunk_start: </span><span class="si">{</span><span class="n">chunk_start</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;chunk: </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="n">num_chunks</span><span class="si">}</span><span class="s2">; </span><span class="se">\n</span><span class="s2">&quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;chunck_size: </span><span class="si">{</span><span class="n">chunk_size_temp</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="n">num_spectra</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
                         <span class="n">chunk_ms_dict</span> <span class="o">=</span> <span class="n">get_chunk_ms_info_inhomogeneous</span><span class="p">(</span>
                             <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
@@ -801,10 +791,19 @@
                 <span class="k">try</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">regression_eq</span>
                 <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-                    <span class="n">regression_eq</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span>
-                        <span class="s2">&quot;Specify a simple linear regression equation of intercept + coefficient. Enter: intercept{one space}coefficient &quot;</span>
-                    <span class="p">)</span>
-                    <span class="n">regression_eq</span> <span class="o">=</span> <span class="n">regression_eq</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+                    <span class="n">ols_exit</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">while</span> <span class="ow">not</span> <span class="n">ols_exit</span><span class="p">:</span>
+                        <span class="n">regression_eq</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span>
+                            <span class="s2">&quot;Specify a simple linear regression equation of intercept + coefficient. Enter: intercept{one space}coefficient &quot;</span>
+                        <span class="p">)</span>
+                        <span class="n">regression_eq</span> <span class="o">=</span> <span class="n">regression_eq</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">regression_eq</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span>
+                                <span class="s2">&quot;Must enter a simple linear regression equation with an intercept and a coefficient for slope. &quot;</span><span class="p">)</span>
+                            <span class="n">ols_exit</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">ols_exit</span> <span class="o">=</span> <span class="kc">True</span>
+
                     <span class="n">regression_eq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
                         <span class="n">regression_eq</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">regression_eq</span> <span class="o">=</span> <span class="n">regression_eq</span>
@@ -820,17 +819,37 @@
                     <span class="n">avg_spectrum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_bins</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">mzs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">min_mz</span><span class="p">,</span> <span class="n">max_mz</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">n_bins</span><span class="p">)</span>
 
-                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">coordinates</span><span class="p">)):</span>
-                        <span class="n">spectrum_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">getspectrum</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-                        <span class="n">intensity_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">digitize</span><span class="p">(</span>
-                            <span class="n">spectrum_i</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">mzs</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
-                        <span class="n">intensity_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_bins</span><span class="p">)</span>
-                        <span class="n">intensity_array</span><span class="p">[</span><span class="n">intensity_index</span><span class="p">]</span> <span class="o">+=</span> <span class="n">spectrum_i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">mzs</span><span class="p">,</span> <span class="n">intensity_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">peak_alignment_func</span><span class="p">(</span>
-                            <span class="n">mz</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mzs</span><span class="p">,</span> <span class="n">intensity</span><span class="o">=</span><span class="n">intensity_array</span>
+                    <span class="n">num_chunks</span><span class="p">,</span> <span class="n">chunk_size_base</span><span class="p">,</span> <span class="n">chunk_start</span><span class="p">,</span> <span class="n">remainder</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">chunk_prep_inhomogeneous</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">percent_RAM</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="n">previous_chunk_size</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">num_spectra</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">coordinates</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_chunks</span><span class="p">):</span>
+                        <span class="n">chunk_size_temp</span> <span class="o">=</span> <span class="n">chunk_size_base</span>
+
+                        <span class="k">if</span> <span class="n">remainder</span> <span class="o">&gt;</span> <span class="n">i</span><span class="p">:</span>
+                            <span class="n">chunk_size_temp</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                        <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">chunk_start</span> <span class="o">+=</span> <span class="n">previous_chunk_size</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;chunk: </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="n">num_chunks</span><span class="si">}</span><span class="s2">; </span><span class="se">\n</span><span class="s2">&quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;chunck_size: </span><span class="si">{</span><span class="n">chunk_size_temp</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="n">num_spectra</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                        <span class="n">chunk_ms_dict</span> <span class="o">=</span> <span class="n">get_chunk_ms_info_inhomogeneous</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
+                            <span class="n">chunk_start</span><span class="p">,</span>
+                            <span class="n">chunk_size_temp</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">max_mz</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">min_mz</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">mz_RP</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">RP</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">dist</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">rp_factor</span><span class="p">,</span>
                         <span class="p">)</span>
 
-                        <span class="n">avg_spectrum</span> <span class="o">+=</span> <span class="n">intensity_array</span>
+                        <span class="n">avg_spectrum</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">chunk_ms_dict</span><span class="p">[</span><span class="s2">&quot;I&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                        <span class="n">previous_chunk_size</span> <span class="o">=</span> <span class="n">chunk_size_temp</span>
 
                     <span class="n">avg_spectrum</span> <span class="o">/=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">coordinates</span><span class="p">)</span>
 
@@ -843,11 +862,10 @@
                     <span class="n">p2</span> <span class="o">=</span> <span class="n">find_peaks</span><span class="p">(</span>
                         <span class="n">x</span><span class="o">=</span><span class="n">avg_spectrum</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">loq</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dist</span>
                     <span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">p2</span> <span class="o">=</span> <span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                     <span class="n">p2_half_width</span> <span class="o">=</span> <span class="n">peak_widths</span><span class="p">(</span>
                         <span class="n">avg_spectrum</span><span class="p">,</span> <span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rel_height</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
                     <span class="n">p2_half_width</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">p2_half_width</span><span class="p">)</span>
-
-                    <span class="bp">self</span><span class="o">.</span><span class="n">p2</span> <span class="o">=</span> <span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
                     <span class="n">p2_half_width</span> <span class="o">=</span> <span class="n">p2_half_width</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span><span class="o">.</span><span class="n">T</span>
                     <span class="n">scale_factor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">p2_half_width</span><span class="p">)</span> <span class="o">-</span> <span class="n">p2_half_width</span>
@@ -882,14 +900,36 @@
                         <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">min_mz</span><span class="p">,</span> <span class="n">max_mz</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">),</span>
                     <span class="p">)</span>
 
-                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">coordinates</span><span class="p">)):</span>
-                        <span class="n">spectrum_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">getspectrum</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-                        <span class="n">spectrum_i</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">spectrum_i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">peak_alignment_func</span><span class="p">(</span>
-                            <span class="n">mz</span><span class="o">=</span><span class="n">spectrum_i</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">intensity</span><span class="o">=</span><span class="n">spectrum_i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">previous_chunk_size</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">chunk_start</span> <span class="o">=</span> <span class="mi">0</span>
+
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_chunks</span><span class="p">):</span>
+                        <span class="n">chunk_size_temp</span> <span class="o">=</span> <span class="n">chunk_size_base</span>
+
+                        <span class="k">if</span> <span class="n">remainder</span> <span class="o">&gt;</span> <span class="n">i</span><span class="p">:</span>
+                            <span class="n">chunk_size_temp</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                        <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">chunk_start</span> <span class="o">+=</span> <span class="n">previous_chunk_size</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;chunk: </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="n">num_chunks</span><span class="si">}</span><span class="s2">; </span><span class="se">\n</span><span class="s2">&quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;chunck_size: </span><span class="si">{</span><span class="n">chunk_size_temp</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="n">num_spectra</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                        <span class="n">chunk_ms_dict</span> <span class="o">=</span> <span class="n">get_chunk_ms_info_inhomogeneous</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
+                            <span class="n">chunk_start</span><span class="p">,</span>
+                            <span class="n">chunk_size_temp</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">max_mz</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">min_mz</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">mz_RP</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">RP</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">dist</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">rp_factor</span><span class="p">,</span>
                         <span class="p">)</span>
-                        <span class="n">intensity_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">digitize</span><span class="p">(</span>
-                            <span class="n">spectrum_i</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">mzs</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
-                        <span class="n">avg_spectrum</span><span class="p">[</span><span class="n">intensity_index</span><span class="p">]</span> <span class="o">+=</span> <span class="n">spectrum_i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">mzs</span><span class="p">,</span> <span class="n">chunk_ms_dict</span><span class="p">[</span><span class="s2">&quot;I&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">peak_alignment_func</span><span class="p">(</span>
+                            <span class="n">mz</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mzs</span><span class="p">,</span> <span class="n">intensity</span><span class="o">=</span><span class="n">chunk_ms_dict</span><span class="p">[</span><span class="s2">&quot;I&quot;</span><span class="p">]</span>
+                        <span class="p">)</span>
+                        <span class="n">avg_spectrum</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">chunk_ms_dict</span><span class="p">[</span><span class="s2">&quot;I&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                        <span class="n">previous_chunk_size</span> <span class="o">=</span> <span class="n">chunk_size_temp</span>
 
                     <span class="n">avg_spectrum</span> <span class="o">/=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">coordinates</span><span class="p">)</span>
 
@@ -905,9 +945,11 @@
                     <span class="n">p2_width</span> <span class="o">=</span> <span class="n">peak_widths</span><span class="p">(</span>
                         <span class="n">avg_spectrum</span><span class="p">,</span> <span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rel_height</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rel_height</span>
                     <span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">p2_width</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">p2_width</span><span class="p">)</span>
 
                     <span class="bp">self</span><span class="o">.</span><span class="n">p2</span> <span class="o">=</span> <span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">p2_width</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">p2_width</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">avg_spectrum</span> <span class="o">=</span> <span class="n">avg_spectrum</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">inhomogeneous</span> <span class="o">=</span> <span class="kc">True</span>
 
                     <span class="n">get_spectrum</span><span class="p">(</span>
                         <span class="n">output_filepath</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="si">}</span><span class="s2">/</span><span class="se">\n</span><span class="s2">&quot;</span>
