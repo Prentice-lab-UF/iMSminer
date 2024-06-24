@@ -1,8 +1,8 @@
-Advanced
-========
+Function Walkthrough
+====================
 iMSminer can be easily interfaced to special-purpose modelling tasks such as deep learning.
 
-interfacing iMSminer with deep learning
----------------------------------------
+colab walkthrough of iMSminer functionalities
+---------------------------------------------
 * Download `iMSminer folder <https://drive.google.com/drive/folders/12Qjz5zlSMwL42W0X_yZxZVZaVXtlhylo?usp=drive_link>`_ to your `Google Drive <https://www.google.com/drive/>`_
-* Open ``iMSminer_Deep_Learning.ipynb`` for walkthrough in Google Colab
+* Open ``iMSminer_functionality_walkthrough.ipynb`` for walkthrough in Google Colab

@@ -697,10 +697,19 @@ class Preprocess:
                 try:
                     self.regression_eq
                 except AttributeError:
-                    regression_eq = input(
-                        "Specify a simple linear regression equation of intercept + coefficient. Enter: intercept{one space}coefficient "
-                    )
-                    regression_eq = regression_eq.split(" ")
+                    ols_exit = False
+                    while not ols_exit:
+                        regression_eq = input(
+                            "Specify a simple linear regression equation of intercept + coefficient. Enter: intercept{one space}coefficient "
+                        )
+                        regression_eq = regression_eq.split(" ")
+                        if len(regression_eq) != 2:
+                            print(
+                                "Must enter a simple linear regression equation with an intercept and a coefficient for slope. ")
+                            ols_exit = False
+                        else:
+                            ols_exit = True
+
                     regression_eq = np.asarray(
                         regression_eq).astype(np.float32)
                     self.regression_eq = regression_eq
@@ -716,17 +725,37 @@ class Preprocess:
                     avg_spectrum = np.zeros(n_bins)
                     self.mzs = np.linspace(min_mz, max_mz, num=n_bins)
 
-                    for i in range(len(self.p.coordinates)):
-                        spectrum_i = self.p.getspectrum(i)
-                        intensity_index = np.digitize(
-                            spectrum_i[0], self.mzs) - 1
-                        intensity_array = np.zeros(n_bins)
-                        intensity_array[intensity_index] += spectrum_i[1]
-                        self.mzs, intensity_array = self.peak_alignment_func(
-                            mz=self.mzs, intensity=intensity_array
+                    num_chunks, chunk_size_base, chunk_start, remainder = (
+                        chunk_prep_inhomogeneous(
+                            self.p, n_bins, self.percent_RAM)
+                    )
+                    previous_chunk_size = 0
+                    num_spectra = len(self.p.coordinates)
+                    for i in range(num_chunks):
+                        chunk_size_temp = chunk_size_base
+
+                        if remainder > i:
+                            chunk_size_temp += 1
+
+                        if i != 0:
+                            chunk_start += previous_chunk_size
+                        print(f"chunk: {i+1} of {num_chunks}; \n"
+                              f"chunck_size: {chunk_size_temp} of {num_spectra}")
+
+                        chunk_ms_dict = get_chunk_ms_info_inhomogeneous(
+                            self.p,
+                            chunk_start,
+                            chunk_size_temp,
+                            self.max_mz,
+                            self.min_mz,
+                            self.mz_RP,
+                            self.RP,
+                            self.dist,
+                            self.rp_factor,
                         )
 
-                        avg_spectrum += intensity_array
+                        avg_spectrum += np.sum(chunk_ms_dict["I"], axis=0)
+                        previous_chunk_size = chunk_size_temp
 
                     avg_spectrum /= len(self.p.coordinates)
 
@@ -739,11 +768,10 @@ class Preprocess:
                     p2 = find_peaks(
                         x=avg_spectrum, height=self.loq * self.noise, distance=self.dist
                     )
+                    self.p2 = p2[0]
                     p2_half_width = peak_widths(
                         avg_spectrum, p2[0], rel_height=0.5)
                     p2_half_width = np.asarray(p2_half_width)
-
-                    self.p2 = p2[0]
 
                     p2_half_width = p2_half_width[2:].T
                     scale_factor = np.ceil(p2_half_width) - p2_half_width
@@ -778,14 +806,36 @@ class Preprocess:
                         np.linspace(min_mz, max_mz, n_bins),
                     )
 
-                    for i in range(len(self.p.coordinates)):
-                        spectrum_i = self.p.getspectrum(i)
-                        spectrum_i[0], spectrum_i[1] = self.peak_alignment_func(
-                            mz=spectrum_i[0], intensity=spectrum_i[1]
+                    previous_chunk_size = 0
+                    chunk_start = 0
+
+                    for i in range(num_chunks):
+                        chunk_size_temp = chunk_size_base
+
+                        if remainder > i:
+                            chunk_size_temp += 1
+
+                        if i != 0:
+                            chunk_start += previous_chunk_size
+                        print(f"chunk: {i+1} of {num_chunks}; \n"
+                              f"chunck_size: {chunk_size_temp} of {num_spectra}")
+
+                        chunk_ms_dict = get_chunk_ms_info_inhomogeneous(
+                            self.p,
+                            chunk_start,
+                            chunk_size_temp,
+                            self.max_mz,
+                            self.min_mz,
+                            self.mz_RP,
+                            self.RP,
+                            self.dist,
+                            self.rp_factor,
                         )
-                        intensity_index = np.digitize(
-                            spectrum_i[0], self.mzs) - 1
-                        avg_spectrum[intensity_index] += spectrum_i[1]
+                        self.mzs, chunk_ms_dict["I"] = self.peak_alignment_func(
+                            mz=self.mzs, intensity=chunk_ms_dict["I"]
+                        )
+                        avg_spectrum += np.sum(chunk_ms_dict["I"], axis=0)
+                        previous_chunk_size = chunk_size_temp
 
                     avg_spectrum /= len(self.p.coordinates)
 
@@ -801,9 +851,11 @@ class Preprocess:
                     p2_width = peak_widths(
                         avg_spectrum, p2[0], rel_height=self.rel_height
                     )
-                    self.p2_width = np.asarray(p2_width)
 
                     self.p2 = p2[0]
+                    self.p2_width = np.asarray(p2_width)
+                    self.avg_spectrum = avg_spectrum
+                    self.inhomogeneous = True
 
                     get_spectrum(
                         output_filepath=f"{self.data_dir}/\n"
