@@ -5,8 +5,10 @@
 - [**Colab Notebooks**](https://drive.google.com/drive/folders/12Qjz5zlSMwL42W0X_yZxZVZaVXtlhylo?usp=sharing)
 - [**Case Studies**](https://docs.google.com/spreadsheets/d/1esn5cARyUs4zbKMVBf7dozmiyD8pQCzWL2dn3S29MAE/edit?usp=sharing)
 - [**Tutorials and Documentation**](https://prentice-lab-uf.github.io/iMSminer/)
-- [**Feedback Form**](https://forms.gle/C16Hrp9ibdtWgyH17)
 - [**PyPI**](https://pypi.org/project/iMSminer/)
+- [**Support Group**](https://groups.google.com/g/imsminer-help)
+- [**Feedback Form**](https://forms.gle/C16Hrp9ibdtWgyH17)
+
 
 ## **Features**
 - Interactive input prompts to enhance user-friendliness
