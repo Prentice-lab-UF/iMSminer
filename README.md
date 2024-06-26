@@ -90,10 +90,10 @@ data_analysis.filter_analytes(method="MS1")
 data_analysis.optimize_image_clustering(k_max=min(10, data_analysis.mz.shape[0] - 1))
 ## optional evaluation of validity of in situ molecular profile 
 data_analysis.optimize_insitu_clustering(k_max=10)
-## image clustering
+## image clustering with optional 3D t-SNE mapped in situ if `insitu_tsne=True`
 data_analysis.image_clustering(
     k=5,
-    perplexity=3,
+    perplexity=5,
     insitu_tsne=False,
     insitu_perplexity=3,
     zoom=0.15,
