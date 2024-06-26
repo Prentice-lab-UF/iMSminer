@@ -26,6 +26,7 @@
 pip install iMSminer
 ```
 ### **GPU-Accelerated Packages**
+For optional NVIDIA® CUDA® GPU acceleration, install:  
 #### [**Cupy**](https://docs.cupy.dev/en/stable/install.html)
 #### [**RAPIDS**](https://docs.rapids.ai/install?_gl=1*1p3fcd0*_ga*MTQxMDQwNDI5NC4xNzE0ODU0NzQx*_ga_RKXFW6CM42*MTcxODg1NzY3MS4xMS4xLjE3MTg4NTc4NTYuNjAuMC4w#wsl2)
 
@@ -69,7 +70,6 @@ preprocess.run(
     plot_num_peaks=10,
 )
 
-
 # =====Analyze Preprocessed Data=====#
 # FOR OPTIONAL FUNCTIONS, SKIP THE LINE IF NOT USING THE CAPABILITY
 ## specify folder path containing preprocessed data
@@ -90,7 +90,7 @@ analyze.filter_analytes(method="MS1")
 analyze.optimize_image_clustering(k_max=min(10, data_analysis.mz.shape[0] - 1))
 ## optional evaluation of validity of in situ molecular profile 
 analyze.optimize_insitu_clustering(k_max=10)
-## image clustering with optional 3D t-SNE mapped in situ if `insitu_tsne=True`
+## image clustering with optional 3D t-SNE mapped in situ (if `insitu_tsne=True`)
 analyze.image_clustering(
     k=5,
     perplexity=5,
@@ -110,7 +110,7 @@ analyze.image_clustering(
 analyze.insitu_clustering(
     k=5, perplexity=15, show_ROI=True, show_square=True, replicate=0, ROI_size_divisor=10
 ) 
-# volcano plot; heatmap if (`get_hm=True`) 
+# volcano plot; heatmap (if `get_hm=True`) 
 analyze.make_FC_plot(
     legend_label="condition",
     feature_label="mz",
