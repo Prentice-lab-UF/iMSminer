@@ -73,25 +73,25 @@ preprocess.run(
 # =====Analyze Preprocessed Data=====#
 # FOR OPTIONAL FUNCTIONS, SKIP THE LINE IF NOT USING THE CAPABILITY
 ## specify folder path containing preprocessed data
-data_analysis = data_analysis.DataAnalysis()
+analyze = data_analysis.DataAnalysis()
 ## ROI annotation and selection
-data_analysis.load_preprocessed_data()
+analyze.load_preprocessed_data()
 ## optional normalization 
-data_analysis.normalize_pixel(method="TIC")
+analyze.normalize_pixel(method="TIC")
 ## optional internal calibration
-data_analysis.calibrate_mz()
+analyze.calibrate_mz()
 ## optional MS1_search 
-data_analysis.MS1_search(
+analyze.MS1_search(
     ppm_threshold=5, MS1_search_method="avg_sepctrum", filter_db=True, percent_RAM=5
 )
 ## optional analyte filtering 
-data_analysis.filter_analytes(method="MS1")
+analyze.filter_analytes(method="MS1")
 ## optional evaluation of image cluster validity  
-data_analysis.optimize_image_clustering(k_max=min(10, data_analysis.mz.shape[0] - 1))
+analyze.optimize_image_clustering(k_max=min(10, data_analysis.mz.shape[0] - 1))
 ## optional evaluation of validity of in situ molecular profile 
-data_analysis.optimize_insitu_clustering(k_max=10)
+analyze.optimize_insitu_clustering(k_max=10)
 ## image clustering with optional 3D t-SNE mapped in situ if `insitu_tsne=True`
-data_analysis.image_clustering(
+analyze.image_clustering(
     k=5,
     perplexity=5,
     insitu_tsne=False,
@@ -107,11 +107,11 @@ data_analysis.image_clustering(
     ROI_size_divisor=10
 )
 # in situ segmentation
-data_analysis.insitu_clustering(
+analyze.insitu_clustering(
     k=5, perplexity=15, show_ROI=True, show_square=True, replicate=0, ROI_size_divisor=10
 ) 
 # volcano plot; heatmap if (`get_hm=True`) 
-data_analysis.make_FC_plot(
+analyze.make_FC_plot(
     legend_label="condition",
     feature_label="mz",
     jitter_amount=0.5,
@@ -124,9 +124,9 @@ data_analysis.make_FC_plot(
     font_size=20,
 )
 # box plot ROI statistics
-data_analysis.make_boxplot()
+analyze.make_boxplot()
 # ion image visualization
-data_analysis.get_ion_image(
+analyze.get_ion_image(
     replicate=0,
     show_ROI=True,
     show_square=True,
