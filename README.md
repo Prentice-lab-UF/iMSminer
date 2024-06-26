@@ -29,18 +29,127 @@ pip install iMSminer
 #### [**Cupy**](https://docs.cupy.dev/en/stable/install.html)
 #### [**RAPIDS**](https://docs.rapids.ai/install?_gl=1*1p3fcd0*_ga*MTQxMDQwNDI5NC4xNzE0ODU0NzQx*_ga_RKXFW6CM42*MTcxODg1NzY3MS4xMS4xLjE3MTg4NTc4NTYuNjAuMC4w#wsl2)
 
+## **Usage**
+Usage guide with commonly tuned parameters
+```python
+# =====Load iMSminer Modules=====#
+from iMSminer import data_preprocessing, data_analysis, utils, ImzMLParser_chunk
+
+# =====Preprocess imzML=====#
+## specify folder path containing imzML's to preprocess and folder path to save preprocessed data and figures 
+preprocess = data_preprocessing.Preprocess()
+## peak picking with optional mass alignment (if `peak_alignment=True`) and baseline subtraction (if `baseline_subtract=True`)
+preprocess.peak_pick(
+    percent_RAM=5,
+    pp_method="automatic",
+    rel_height=0.9,
+    peak_alignment=True,
+    align_threshold=1,
+    align_halfwidth=100,
+    grid_iter_num=20,
+    align_reduce=False,
+    reduce_halfwidth=200,
+    plot_aligned_peak=True,
+    index_peak_plot=50,
+    plot_num_peaks=10,
+    baseline_subtract=True,
+    baseline_method="regression",
+)
+## peak integration with bounds rel_height and optional mass alignment (if `peak_alignment=True`)
+preprocess.run(
+    percent_RAM=5,
+    peak_alignment=True,
+    integrate_method="peak_width",
+    align_halfwidth=100,
+    grid_iter_num=20,
+    align_reduce=False,
+    reduce_halfwidth=200,
+    plot_aligned_peak=True,
+    index_peak_plot=50,
+    plot_num_peaks=10,
+)
+
+
+# =====Analyze Preprocessed Data=====#
+# FOR OPTIONAL FUNCTIONS, SKIP THE LINE IF NOT USING THE CAPABILITY
+## specify folder path containing preprocessed data
+data_analysis = data_analysis.DataAnalysis()
+## ROI annotation and selection
+data_analysis.load_preprocessed_data()
+## optional normalization 
+data_analysis.normalize_pixel(method="TIC")
+## optional internal calibration
+data_analysis.calibrate_mz()
+## optional MS1_search 
+data_analysis.MS1_search(
+    ppm_threshold=5, MS1_search_method="avg_sepctrum", filter_db=True, percent_RAM=5
+)
+## optional analyte filtering 
+data_analysis.filter_analytes(method="MS1")
+## optional evaluation of image cluster validity  
+data_analysis.optimize_image_clustering(k_max=min(10, data_analysis.mz.shape[0] - 1))
+## optional evaluation of validity of in situ molecular profile 
+data_analysis.optimize_insitu_clustering(k_max=10)
+## image clustering
+data_analysis.image_clustering(
+    k=5,
+    perplexity=3,
+    insitu_tsne=False,
+    insitu_perplexity=3,
+    zoom=0.15,
+    quantile=99.9,
+    replicate=0,
+    img_plot_method="plot_ROI",
+    feature_label="mz",
+    jitter_amount=2,
+    jitter_factor=5,
+    font_size=20,
+    ROI_size_divisor=10
+)
+# in situ segmentation
+data_analysis.insitu_clustering(
+    k=5, perplexity=15, show_ROI=True, show_square=True, replicate=0, ROI_size_divisor=10
+) 
+# volcano plot; heatmap if (`get_hm=True`) 
+data_analysis.make_FC_plot(
+    legend_label="condition",
+    feature_label="mz",
+    jitter_amount=0.5,
+    jitter_factor=3,
+    get_hm=True,
+    hm_width_factor=10,
+    hm_height_factor=20,
+    hm_fontsize=20,
+    hm_wspace=1.5,
+    font_size=20,
+)
+# box plot ROI statistics
+data_analysis.make_boxplot()
+# ion image visualization
+data_analysis.get_ion_image(
+    replicate=0,
+    show_ROI=True,
+    show_square=True,
+    color_scheme="inferno",
+    quantile=99.9,
+    ROI_size_divisor=10
+)
+```
+
 ## **Call for Contributions**
 We appreciate contributions of any form, from feedback to debugging to method development. We enthusiastically welcome developers to interface their published models with iMSminer and host quickstart guides on Google Colab. Please feel free to contact us at [prenticelabuf@gmail.com](mailto:prenticelabuf@gmail.com). 
 
 ## **Citation**
 Please consider citing iMSminer and related packages if iMSminer is helpful to your work
 ```
-@software{imsminer2024,
-  author = {Yu Tin Lin and Haohui Bao and Troy R. Scoggings IV and Boone M. Prentice},
-  title = {{iMSminer}: A Data Processing and Machine Learning Package for Imaging Mass Spectrometry},
-  url = {https://github.com/Prentice-lab-UF/iMSminer},
-  version = {1.0.0},
+@article{Lin2024,
+  title = {iMSminer: A Data Processing and Machine Learning Package for Imaging Mass Spectrometry},
+  url = {http://dx.doi.org/10.26434/chemrxiv-2024-kxjgg},
+  DOI = {10.26434/chemrxiv-2024-kxjgg},
+  publisher = {American Chemical Society (ACS)},
+  author = {Lin,  Yu Tin and Bao,  Haohui and Scoggins,  Troy and Prentice,  Boone},
   year = {2024},
+  month = jun 
 }
 
 @software{pyimzml,
