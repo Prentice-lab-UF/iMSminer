@@ -12,11 +12,11 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=292eb321"></script>
-        <script src="../../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -44,6 +44,7 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../function_walkthrough.html">Function Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../modules.html">iMSminer</a></li>
 </ul>
@@ -75,7 +76,7 @@
   <h1>Source code for iMSminer.data_preprocessing</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">iMSminer beta</span>
+<span class="sd">iMSminer: A Data Processing and Machine Learning Package for Imaging Mass Spectrometry</span>
 <span class="sd">@author: Yu Tin Lin (yutinlin@stanford.edu)</span>
 <span class="sd">@author: Haohui Bao (susanab20020911@gmail.com)</span>
 <span class="sd">@author: Troy R. Scoggins IV (t.scoggins@ufl.edu)</span>
@@ -120,9 +121,7 @@
 <span class="c1"># ========================DATA PROCESSING========================#</span>
 
 
-<div class="viewcode-block" id="prompt_for_attributes">
-<a class="viewcode-back" href="../../iMSminer.html#iMSminer.data_preprocessing.prompt_for_attributes">[docs]</a>
-<span class="k">def</span> <span class="nf">prompt_for_attributes</span><span class="p">(</span><span class="n">prompt_func</span><span class="p">):</span>
+<div class="viewcode-block" id="prompt_for_attributes"><a class="viewcode-back" href="../../iMSminer.html#iMSminer.data_preprocessing.prompt_for_attributes">[docs]</a><span class="k">def</span> <span class="nf">prompt_for_attributes</span><span class="p">(</span><span class="n">prompt_func</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Decorator for question prompts</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -141,10 +140,7 @@
     <span class="k">return</span> <span class="n">decorator</span></div>
 
 
-
-<div class="viewcode-block" id="prompt_func">
-<a class="viewcode-back" href="../../iMSminer.html#iMSminer.data_preprocessing.prompt_func">[docs]</a>
-<span class="k">def</span> <span class="nf">prompt_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">):</span>
+<div class="viewcode-block" id="prompt_func"><a class="viewcode-back" href="../../iMSminer.html#iMSminer.data_preprocessing.prompt_func">[docs]</a><span class="k">def</span> <span class="nf">prompt_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Question prompts for various attributes for class Preprocess()</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -177,10 +173,7 @@
     <span class="k">return</span> <span class="n">prompts</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]()</span></div>
 
 
-
-<div class="viewcode-block" id="Preprocess">
-<a class="viewcode-back" href="../../iMSminer.html#iMSminer.data_preprocessing.Preprocess">[docs]</a>
-<span class="k">class</span> <span class="nc">Preprocess</span><span class="p">:</span>
+<div class="viewcode-block" id="Preprocess"><a class="viewcode-back" href="../../iMSminer.html#iMSminer.data_preprocessing.Preprocess">[docs]</a><span class="k">class</span> <span class="nc">Preprocess</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Contains functions to import imzML, generate interactive mean mass spectrum, perform peak picking, mass alignment, and peak integration</span>
 
@@ -246,9 +239,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">rp_factor</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resolution_progress</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="Preprocess.check_attributes">
-<a class="viewcode-back" href="../../iMSminer.html#iMSminer.data_preprocessing.Preprocess.check_attributes">[docs]</a>
-    <span class="nd">@prompt_for_attributes</span><span class="p">(</span><span class="n">prompt_func</span><span class="p">)</span>
+<div class="viewcode-block" id="Preprocess.check_attributes"><a class="viewcode-back" href="../../iMSminer.html#iMSminer.data_preprocessing.Preprocess.check_attributes">[docs]</a>    <span class="nd">@prompt_for_attributes</span><span class="p">(</span><span class="n">prompt_func</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">check_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">attributes</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;dist&quot;</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span>
@@ -313,10 +304,7 @@
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">attributes</span></div>
 
-
-<div class="viewcode-block" id="Preprocess.peak_pick">
-<a class="viewcode-back" href="../../iMSminer.html#iMSminer.data_preprocessing.Preprocess.peak_pick">[docs]</a>
-    <span class="k">def</span> <span class="nf">peak_pick</span><span class="p">(</span>
+<div class="viewcode-block" id="Preprocess.peak_pick"><a class="viewcode-back" href="../../iMSminer.html#iMSminer.data_preprocessing.Preprocess.peak_pick">[docs]</a>    <span class="k">def</span> <span class="nf">peak_pick</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">percent_RAM</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
         <span class="n">pp_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;point&quot;</span><span class="p">,</span>
@@ -397,10 +385,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">peak_alignment</span> <span class="o">=</span> <span class="n">peak_alignment</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">peak_pick_func</span><span class="p">()</span></div>
 
-
-<div class="viewcode-block" id="Preprocess.run">
-<a class="viewcode-back" href="../../iMSminer.html#iMSminer.data_preprocessing.Preprocess.run">[docs]</a>
-    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
+<div class="viewcode-block" id="Preprocess.run"><a class="viewcode-back" href="../../iMSminer.html#iMSminer.data_preprocessing.Preprocess.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">percent_RAM</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
         <span class="n">peak_alignment</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -548,10 +533,7 @@
 
             <span class="k">del</span> <span class="n">peaks_df</span><span class="p">,</span> <span class="n">coords_df</span></div>
 
-
-<div class="viewcode-block" id="Preprocess.peak_pick_func">
-<a class="viewcode-back" href="../../iMSminer.html#iMSminer.data_preprocessing.Preprocess.peak_pick_func">[docs]</a>
-    <span class="k">def</span> <span class="nf">peak_pick_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Preprocess.peak_pick_func"><a class="viewcode-back" href="../../iMSminer.html#iMSminer.data_preprocessing.Preprocess.peak_pick_func">[docs]</a>    <span class="k">def</span> <span class="nf">peak_pick_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Performs peak picking using method `point`, `specify_noise`, `automatic`, `binning_even` or `binning_regression`, with optional baseline subtraction using method `regression` or `noise`&quot;&quot;&quot;</span>
 
         <span class="k">try</span><span class="p">:</span>
@@ -982,10 +964,7 @@
                 <span class="p">)</span>
                 <span class="k">return</span></div>
 
-
-<div class="viewcode-block" id="Preprocess.peak_alignment_func">
-<a class="viewcode-back" href="../../iMSminer.html#iMSminer.data_preprocessing.Preprocess.peak_alignment_func">[docs]</a>
-    <span class="k">def</span> <span class="nf">peak_alignment_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mz</span><span class="p">,</span> <span class="n">intensity</span><span class="p">):</span>
+<div class="viewcode-block" id="Preprocess.peak_alignment_func"><a class="viewcode-back" href="../../iMSminer.html#iMSminer.data_preprocessing.Preprocess.peak_alignment_func">[docs]</a>    <span class="k">def</span> <span class="nf">peak_alignment_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mz</span><span class="p">,</span> <span class="n">intensity</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;ALigns input intensity array based on peak index or m/z values</span>
 
 <span class="sd">        Parameters</span>
@@ -1128,10 +1107,7 @@
 
         <span class="k">return</span> <span class="n">mz</span><span class="p">,</span> <span class="n">intensity</span></div>
 
-
-<div class="viewcode-block" id="Preprocess.get_p2">
-<a class="viewcode-back" href="../../iMSminer.html#iMSminer.data_preprocessing.Preprocess.get_p2">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_p2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Preprocess.get_p2"><a class="viewcode-back" href="../../iMSminer.html#iMSminer.data_preprocessing.Preprocess.get_p2">[docs]</a>    <span class="k">def</span> <span class="nf">get_p2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates noise level on average spectrum, performs peak picking, and calculates peak widths for peak integration</span>
 
 <span class="sd">        Returns</span>
@@ -1197,10 +1173,7 @@
 
         <span class="k">return</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p2_width</span></div>
 
-
-<div class="viewcode-block" id="Preprocess.baseline_subtraction">
-<a class="viewcode-back" href="../../iMSminer.html#iMSminer.data_preprocessing.Preprocess.baseline_subtraction">[docs]</a>
-    <span class="k">def</span> <span class="nf">baseline_subtraction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Preprocess.baseline_subtraction"><a class="viewcode-back" href="../../iMSminer.html#iMSminer.data_preprocessing.Preprocess.baseline_subtraction">[docs]</a>    <span class="k">def</span> <span class="nf">baseline_subtraction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">baseline_pred</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
@@ -1267,9 +1240,7 @@
                     <span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">baseline_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise</span> <span class="o">*</span> <span class="n">baseline_factor</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">avg_spectrum</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseline_pred</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">avg_spectrum</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">avg_spectrum</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span></div>
-</div>
-
+                <span class="bp">self</span><span class="o">.</span><span class="n">avg_spectrum</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">avg_spectrum</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span></div></div>
 </pre></div>
 
            </div>

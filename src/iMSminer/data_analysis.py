@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-iMSminer Alpha
+iMSminer: A Data Processing and Machine Learning Package for Imaging Mass Spectrometry 
 @author: Yu Tin Lin (yutinlin@stanford.edu)
 @author: Haohui Bao (susanab20020911@gmail.com)
 @author: Troy R. Scoggins IV (t.scoggins@ufl.edu)
@@ -226,7 +226,8 @@ class DataAnalysis:
                     ROI_xy = (df_build['x'] >= left) & (df_build['x'] < right) & (
                         df_build['y'] >= bottom) & (df_build['y'] < top)
                     df_build.loc[ROI_xy, "ROI"] = ROI
-                    df_build.loc[ROI_xy, "ROI_num"] = i
+                    df_build.loc[ROI_xy, "ROI_num"] = np.sum(
+                        df_build["ROI"] == ROI)
                     ROI_edge = pd.concat([ROI_edge, pd.Series(
                         [ROI, bottom, top, left, right, rep])], axis=1)
                 except:
@@ -412,6 +413,7 @@ class DataAnalysis:
                 [-1, 1]).astype(np.float32)
             mz = mz.to_numpy().reshape([-1, 1]).astype(np.float32)
             mz = np.column_stack((analyte_index, mz))
+            MS1_db_array = np.asarray(MS1_db)
             RAM_available = psutil.virtual_memory()[1]
             num_chunks = int(mz.shape[0] * MS1_db_array.shape[0] *
                              np.dtype(np.float32).itemsize / (RAM_available * percent_RAM/100)) + 1
@@ -729,6 +731,10 @@ class DataAnalysis:
             Labeling scehem for data points in volcano plot, by default `mz`
             Method `mz` labels significant data points by their corresponding m/z values
             Method `analyte` labels significant data points by their corresponding analylte IDs.Prequisite: DataAnalysis.MS1_search()
+        hm_label : str, optional
+            Labeling scheme for data points in heatmap, by default `mz`
+            Method `mz` visualizes m/z values
+            Method `analyte` visualizes analyte IDs. Prequisite: DataAnalysis.MS1_search()
         jitter_amount : float, optional
             Controls placement of feature label in volcano plot, by default 2
         jitter_factor : float, optional
@@ -766,10 +772,10 @@ class DataAnalysis:
                                             != 'placeholder']
         if self.df_mean_all['ROI'].shape[0] < 2:
             warnings.warn("Needs at least 2 ROIs.", RuntimeWarning)
-            return None
+        # return None
 
         df_mean_all_long = pd.melt(self.df_mean_all, id_vars=[
-                                   'ROI', 'replicate', 'ROI_num', 'x', 'y'], var_name='analyte', value_name='intensity')
+            'ROI', 'replicate', 'ROI_num', 'x', 'y'], var_name='analyte', value_name='intensity')
         df_mean_all_long['analyte'] = df_mean_all_long['analyte'].astype(int)
         df_FC = df_mean_all_long.groupby(
             ['ROI', 'analyte']).mean().reset_index()
@@ -783,8 +789,12 @@ class DataAnalysis:
             if any(df_FC_pair['intensity'] == 0):
                 print(f"Analyte(s) \n{self.mz[(df_FC_pair['intensity'] == 0).reset_index(drop=True)]} \nhave a zero mean intensity in \n"
                       f"{combo[0]}. Excluded from volcano plot {combo[0]} / {combo[1]}. ")
+                exclude_analyte = df_FC_pair.loc[df_FC_pair['intensity'] == 0, "analyte"].to_numpy(
+                )
                 df_FC_pair = df_FC_pair.loc[~df_FC_pair['analyte'].isin(
-                    df_FC_pair.loc[df_FC_pair['intensity'] == 0, "analyte"].to_numpy())]
+                    exclude_analyte)]
+            else:
+                exclude_analyte = None
             reference_intensity = df_FC_pair[df_FC_pair['ROI'] == combo[1]].groupby('analyte')[
                 'intensity'].mean()
             df_FC_pair = df_FC_pair.merge(
@@ -810,115 +820,115 @@ class DataAnalysis:
                 df_FC_pair.loc[df_FC_pair['analyte'] ==
                                analyte_sele, 'p'] = anova_df['PR(>F)'][0]
 
-                df_FC_pair['p'] = -np.log10(df_FC_pair['p'])
-                df_FC_pair['legend'] = "placeholder"
-                df_vp = df_FC_pair[df_FC_pair['ROI']
-                                   == combo[0]].set_index('analyte')
-                if legend_label == "condition":
-                    palette = {
-                        "placeholder": "grey",
-                        "downregulated": "blue",
-                        "upregulated": "red"
-                    }
-                    df_vp.loc[(df_vp['p'] > -np.log10(pthreshold)) & (
-                        df_vp['intensity'] < -np.log2(FCthreshold)), 'legend'] = "downregulated"
-                    df_vp.loc[(df_vp['p'] > -np.log10(pthreshold)) & (
-                        df_vp['intensity'] > np.log2(FCthreshold)), 'legend'] = "upregulated"
-                elif legend_label == "analyte_class":
-                    color_keys = list(mcolors.TABLEAU_COLORS.keys())[
-                        :len(self.filter_by)]
-                    palette = dict(zip(self.filter_by, color_keys))
-                    palette = {"placeholder": "grey"} | palette
-                    vp_features = self.ms1_df.iloc[:, [
-                        0, self.col_filter+1]].drop_duplicates().to_numpy()
-                    df_vp = df_vp.iloc[vp_features[:, 0].astype(int)]
-                    vp_indices = (df_vp['p'] > -np.log10(pthreshold)
-                                  ) & (abs(df_vp['intensity']) > np.log2(FCthreshold))
-                    df_vp.loc[vp_indices,
-                              "legend"] = vp_features[vp_indices, 1]
-                plt.rcParams.update({'font.size': 200/self.fig_ratio*1.5})
-                fig = plt.figure(figsize=(self.fig_ratio *
-                                          1.5, self.fig_ratio*1.5))
-                ax = fig.add_subplot()
-                scatter_plt = sns.scatterplot(data=df_vp,
-                                              x="intensity", y="p", hue="legend",
-                                              palette=palette, s=80, ax=ax)
-                colors = scatter_plt.collections[0].get_facecolors()
-                ax.set_title(f'{combo[0]} / {combo[1]}', weight="bold")
-                ax.set_xlabel('Log2 FC', weight="bold")
-                ax.set_ylabel('-Log10 p_value', weight="bold")
-                plt.axvline(x=-np.log2(FCthreshold), color='black',
-                            linewidth=1.5, linestyle='--')
-                plt.axvline(x=np.log2(FCthreshold), color='black',
-                            linewidth=1.5, linestyle='--')
-                plt.axhline(y=-np.log10(pthreshold), color='black',
-                            linewidth=1.5, linestyle='--')
-                if feature_label == "mz":
-                    vp_indices = (df_vp['p'] > -np.log10(pthreshold)
-                                  ) & (abs(df_vp['intensity']) > np.log2(FCthreshold))
-                    try:
-                        repel_labels(ax, df_vp['intensity'][vp_indices],  df_vp['p'][vp_indices],
-                                     np.round(self.mz.iloc[np.unique(
-                                         df_FC_pair['analyte'])].to_numpy(), 1)[vp_indices],
-                                     colors[vp_indices], k=jitter_amount, jitter_factor=jitter_factor, font_size=font_size)
-                    except NameError:
-                        pass
-                elif feature_label == "analyte":
-                    df_vp_mapping = df_vp.iloc[self.ms1_df['analyte'].to_numpy().astype(
-                        int)]
-                    vp_indices = (df_vp_mapping['p'] > -np.log10(pthreshold)) & (
-                        abs(df_vp_mapping['intensity']) > np.log2(FCthreshold))
-                    try:
-                        repel_labels(ax, df_vp_mapping['intensity'][vp_indices],  df_vp_mapping['p'][vp_indices],
-                                     self.ms1_df.iloc[:, analyte_col][vp_indices.reset_index(
-                                         drop=True)], colors[vp_indices], k=jitter_amount,
-                                     jitter_factor=jitter_factor, font_size=font_size)
-                    except NameError:
-                        pass
-                elif feature_label == "none":
+            df_FC_pair['p'] = -np.log10(df_FC_pair['p'])
+            df_FC_pair['legend'] = "placeholder"
+            df_vp = df_FC_pair[df_FC_pair['ROI']
+                               == combo[0]].set_index('analyte')
+            if legend_label == "condition":
+                palette = {
+                    "placeholder": "grey",
+                    "downregulated": "blue",
+                    "upregulated": "red"
+                }
+                df_vp.loc[(df_vp['p'] > -np.log10(pthreshold)) & (
+                    df_vp['intensity'] < -np.log2(FCthreshold)), 'legend'] = "downregulated"
+                df_vp.loc[(df_vp['p'] > -np.log10(pthreshold)) & (
+                    df_vp['intensity'] > np.log2(FCthreshold)), 'legend'] = "upregulated"
+            elif legend_label == "analyte_class":
+                color_keys = list(mcolors.TABLEAU_COLORS.keys())[
+                    :len(self.filter_by)]
+                palette = dict(zip(self.filter_by, color_keys))
+                palette = {"placeholder": "grey"} | palette
+                vp_features = self.ms1_df.iloc[:, [
+                    0, self.col_filter+1]].drop_duplicates().to_numpy()
+                df_vp = df_vp.iloc[vp_features[:, 0].astype(int)]
+                vp_indices = (df_vp['p'] > -np.log10(pthreshold)
+                              ) & (abs(df_vp['intensity']) > np.log2(FCthreshold))
+                df_vp.loc[vp_indices,
+                          "legend"] = vp_features[vp_indices, 1]
+            plt.rcParams.update({'font.size': 200/self.fig_ratio*1.5})
+            fig = plt.figure(figsize=(self.fig_ratio *
+                                      1.5, self.fig_ratio*1.5))
+            ax = fig.add_subplot()
+            scatter_plt = sns.scatterplot(data=df_vp,
+                                          x="intensity", y="p", hue="legend",
+                                          palette=palette, s=80, ax=ax)
+            colors = scatter_plt.collections[0].get_facecolors()
+            ax.set_title(f'{combo[0]} / {combo[1]}', weight="bold")
+            ax.set_xlabel('Log2 FC', weight="bold")
+            ax.set_ylabel('-Log10 p_value', weight="bold")
+            plt.axvline(x=-np.log2(FCthreshold), color='black',
+                        linewidth=1.5, linestyle='--')
+            plt.axvline(x=np.log2(FCthreshold), color='black',
+                        linewidth=1.5, linestyle='--')
+            plt.axhline(y=-np.log10(pthreshold), color='black',
+                        linewidth=1.5, linestyle='--')
+            if feature_label == "mz":
+                vp_indices = (df_vp['p'] > -np.log10(pthreshold)
+                              ) & (abs(df_vp['intensity']) > np.log2(FCthreshold))
+                try:
+                    repel_labels(ax, df_vp['intensity'][vp_indices],  df_vp['p'][vp_indices],
+                                 np.round(self.mz.iloc[np.unique(
+                                     df_FC_pair['analyte'])].to_numpy(), 1)[vp_indices],
+                                 colors[vp_indices], k=jitter_amount, jitter_factor=jitter_factor, font_size=font_size)
+                except ValueError:
                     pass
-                handles, labels = scatter_plt.get_legend_handles_labels()
-                filtered_handles = [h for h, l in zip(
-                    handles, labels) if l != 'placeholder']
-                filtered_labels = [l for l in labels if l != 'placeholder']
-                ax.legend(filtered_handles, filtered_labels,
-                          title_fontproperties={'weight': 'bold'})
+            elif feature_label == "analyte":
+                vp_retain = self.ms1_df.loc[self.ms1_df['analyte'] != exclude_analyte, 'analyte'].to_numpy().astype(
+                    int)
+                _, vp_retain = np.unique(vp_retain, return_inverse=True)
+                df_vp_mapping = df_vp.iloc[vp_retain]
+                colors = [color for color in colors[vp_retain]]
+                vp_indices = (df_vp_mapping['p'] > -np.log10(pthreshold)) & (
+                    abs(df_vp_mapping['intensity']) > np.log2(FCthreshold))
+                try:
+                    repel_labels(ax, df_vp_mapping['intensity'][vp_indices],  df_vp_mapping['p'][vp_indices],
+                                 self.ms1_df.iloc[:, analyte_col][vp_indices.reset_index(
+                                     drop=True)], pd.Series(colors)[vp_indices.reset_index(drop=True)], k=jitter_amount,
+                                 jitter_factor=jitter_factor, font_size=font_size)
+                except ValueError:
+                    pass
+            elif feature_label == "none":
+                pass
+            handles, labels = scatter_plt.get_legend_handles_labels()
+            filtered_handles = [h for h, l in zip(
+                handles, labels) if l != 'placeholder']
+            filtered_labels = [l for l in labels if l != 'placeholder']
+            ax.legend(filtered_handles, filtered_labels,
+                      title_fontproperties={'weight': 'bold'})
 
-                plt.tight_layout()
-                plt.savefig(
-                    f"{self.data_dir}/figures/volcano/{combo[0]}_{combo[1]}", dpi=300)
-                plt.show()
+            plt.tight_layout()
+            plt.savefig(
+                f"{self.data_dir}/figures/volcano/{combo[0]}_{combo[1]}", dpi=300)
+            plt.show()
 
-                # vocalno unlabeled
-                plt.rcParams.update({'font.size': 200/self.fig_ratio*1.5})
-                fig = plt.figure(
-                    figsize=(self.fig_ratio*1.5, self.fig_ratio*1.5))
-                ax = fig.add_subplot()
-                scatter_plt = sns.scatterplot(data=df_vp,
-                                              x="intensity", y="p", hue="legend",
-                                              palette=palette, s=80, ax=ax)
-                ax.set_title(f'{combo[0]} / {combo[1]}', weight="bold")
-                ax.set_xlabel('Log2 FC', weight="bold")
-                ax.set_ylabel('-Log10 p_value', weight="bold")
-                plt.axvline(x=-np.log2(FCthreshold), color='black',
-                            linewidth=1.5, linestyle='--')
-                plt.axvline(x=np.log2(FCthreshold), color='black',
-                            linewidth=1.5, linestyle='--')
-                plt.axhline(y=-np.log10(pthreshold), color='black',
-                            linewidth=1.5, linestyle='--')
-                handles, labels = scatter_plt.get_legend_handles_labels()
-                filtered_handles = [h for h, l in zip(
-                    handles, labels) if l != 'placeholder']
-                filtered_labels = [l for l in labels if l != 'placeholder']
-                ax.legend(filtered_handles, filtered_labels,
-                          title_fontproperties={'weight': 'bold'})
-                plt.tight_layout()
-                plt.savefig(
-                    f"{self.data_dir}/figures/volcano_unlabeled/{combo[0]}_{combo[1]}", dpi=300)
-                plt.show()
-
-                print(f"Finished generating volcano plots. \n"
-                      f"Volcano plots were stroed in folder {self.data_dir}/figures.")
+            # vocalno unlabeled
+            plt.rcParams.update({'font.size': 200/self.fig_ratio*1.5})
+            fig = plt.figure(
+                figsize=(self.fig_ratio*1.5, self.fig_ratio*1.5))
+            ax = fig.add_subplot()
+            scatter_plt = sns.scatterplot(data=df_vp,
+                                          x="intensity", y="p", hue="legend",
+                                          palette=palette, s=80, ax=ax)
+            ax.set_title(f'{combo[0]} / {combo[1]}', weight="bold")
+            ax.set_xlabel('Log2 FC', weight="bold")
+            ax.set_ylabel('-Log10 p_value', weight="bold")
+            plt.axvline(x=-np.log2(FCthreshold), color='black',
+                        linewidth=1.5, linestyle='--')
+            plt.axvline(x=np.log2(FCthreshold), color='black',
+                        linewidth=1.5, linestyle='--')
+            plt.axhline(y=-np.log10(pthreshold), color='black',
+                        linewidth=1.5, linestyle='--')
+            handles, labels = scatter_plt.get_legend_handles_labels()
+            filtered_handles = [h for h, l in zip(
+                handles, labels) if l != 'placeholder']
+            filtered_labels = [l for l in labels if l != 'placeholder']
+            ax.legend(filtered_handles, filtered_labels,
+                      title_fontproperties={'weight': 'bold'})
+            plt.tight_layout()
+            plt.savefig(
+                f"{self.data_dir}/figures/volcano_unlabeled/{combo[0]}_{combo[1]}", dpi=300)
+            plt.show()
 
         if get_hm:
             df_hm = df_hm.pivot(
@@ -927,20 +937,11 @@ class DataAnalysis:
                 df_hm.set_index(self.mz[df_hm.index.to_numpy()], inplace=True)
             elif hm_label == "analyte":
                 ID_col = int(input(
-                    "Which column [number] in database to perform filtering? The columns are {self.ms1_df.columns}: ")) - 1
+                    f"Enter the column [number] to use for labeling analytes in heatmap. The columns are {self.ms1_df.columns}: ")) - 1
                 df_hm = df_hm.iloc[self.ms1_df['analyte'].to_numpy().astype(
                     int)]
-                df_hm.set_index(self.ms1_df.iloc[:, ID_col+1], inplace=True)
+                df_hm.set_index(self.ms1_df.iloc[:, ID_col], inplace=True)
 
-                try:
-                    self.col_filter
-                    self.filter_by
-                except AttributeError:
-                    self.col_filter = int(input(
-                        "Which column [number] in database to perform filtering? The columns are {self.ms1_df.columns}: ")) - 1
-                    filter_by = input(
-                        f"What are the groups of interest for filtering column {self.col_filter+1} in MS1 database? Separate each group by one space? ")
-                    self.filter_by = filter_by.split(" ")
             df_hm = np.log2(df_hm.div(df_hm.mean(axis=1), axis=0))
 
             fig = plt.figure(figsize=(
@@ -965,13 +966,17 @@ class DataAnalysis:
                 ax.set_xticks(np.arange(df_hm.shape[1]))
                 ax.set_xticklabels(df_hm.columns, rotation=90)
             elif hm_label == "analyte":
+                self.col_sep = int(input(
+                    f"Enter the column [number] that contains the groups of interest. The columns are {self.ms1_df.columns}: ")) - 1
+                filter_by = input(
+                    f"Enter the groups of interest from {self.col_sep+1}. Separate each group by one space: ")
+                self.filter_by = filter_by.split(" ")
                 gs = GridSpec(1, len(self.filter_by) + 1, width_ratios=[1]*len(
                     self.filter_by) + [0.1], figure=fig, wspace=hm_wspace)
                 for k, analyte_class in enumerate(self.filter_by):
                     ax = fig.add_subplot(gs[0, k])
-
                     df_hm_subset = df_hm[(
-                        self.ms1_df.iloc[:, self.col_filter+1] == analyte_class).to_numpy()]
+                        self.ms1_df.iloc[:, self.col_sep] == analyte_class).to_numpy()]
                     hm_plt = ax.imshow(df_hm_subset.to_numpy(),
                                        cmap='coolwarm', aspect='auto')
                     hm_plt.set_clim(-3, 3)
@@ -995,6 +1000,7 @@ class DataAnalysis:
             plt.savefig(f"{self.data_dir}/figures/volcano/heatmap",
                         dpi=100, bbox_inches='tight')
             plt.show()
+            
 
     def insitu_clustering(
             self,
@@ -1470,24 +1476,27 @@ class DataAnalysis:
         image_cluster_all[['x', 'y']] = df_pixel_all_max[['x', 'y']]
         image_cluster_all = image_cluster_all[df_pixel_all_max['replicate'] == replicate]
 
+        plt.style.use('default')
         plt.rcParams.update({'font.size': 200/self.fig_ratio*1.5})
         fig = plt.figure(figsize=(self.fig_ratio*1.5, self.fig_ratio*1.5))
         ax = fig.add_subplot()
         cmap = plt.cm.get_cmap('rainbow', len(np.unique(kmeans_labels)))
         label_to_color = {label: cmap(
             i) for i, label in enumerate(np.unique(kmeans_labels))}
-        flat_colors = [label_to_color[label] for label in kmeans_labels]
         for i, label in enumerate(np.unique(kmeans_labels)):
             ax.scatter(tsne_embedding[kmeans_labels == label, 0], tsne_embedding[kmeans_labels == label, 1],
                        c=cmap(i),
                        alpha=1, label=f'Cluster {label}', s=50)
         if feature_label == "mz":
+            flat_colors = [label_to_color[label] for label in kmeans_labels]
             repel_labels(ax, tsne_embedding[:, 0], tsne_embedding[:, 1],
                          np.round(self.mz.to_numpy(), 1), flat_colors, k=jitter_amount, jitter_factor=jitter_factor, font_size=font_size)
         elif feature_label == "analyte":
             ms1_features = self.ms1_df.iloc[:, [
                 0, analyte_col]].drop_duplicates().to_numpy()
             tsne_mapping = tsne_embedding[ms1_features[:, 0].astype(int),]
+            flat_colors = [label_to_color[label]
+                           for label in kmeans_labels[ms1_features[:, 0].astype(int)]]
             repel_labels(ax, tsne_mapping[:, 0], tsne_mapping[:, 1],
                          ms1_features[:, 1], flat_colors, k=jitter_amount,
                          jitter_factor=jitter_factor, font_size=font_size)
