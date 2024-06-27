@@ -1,6 +1,6 @@
 Function Walkthrough
 ====================
-iMSminer can be easily interfaced to special-purpose modelling tasks such as deep learning.
+A more detailed walkthrough of functionalities provided by iMSminer in Google Colab.
 
 colab walkthrough of iMSminer functionalities
 ---------------------------------------------

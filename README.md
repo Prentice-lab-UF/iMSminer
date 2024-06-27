@@ -33,10 +33,10 @@ For optional NVIDIA® CUDA® GPU acceleration, install:
 ## **Usage**
 Usage guide with commonly tuned parameters
 ```python
-# =====Load iMSminer Modules=====#
+# =====Load iMSminer Modules===== #
 from iMSminer import data_preprocessing, data_analysis, utils, ImzMLParser_chunk
 
-# =====Preprocess imzML=====#
+# =====Preprocess imzML===== #
 ## specify folder path containing imzML's to preprocess and folder path to save preprocessed data and figures 
 preprocess = data_preprocessing.Preprocess()
 ## peak picking with optional mass alignment (if `peak_alignment=True`) and baseline subtraction (if `baseline_subtract=True`)
@@ -70,7 +70,7 @@ preprocess.run(
     plot_num_peaks=10,
 )
 
-# =====Analyze Preprocessed Data=====#
+# =====Analyze Preprocessed Data===== #
 # FOR OPTIONAL FUNCTIONS, SKIP THE LINE IF NOT USING THE CAPABILITY
 ## specify folder path containing preprocessed data
 analyze = data_analysis.DataAnalysis()
@@ -87,7 +87,7 @@ analyze.MS1_search(
 ## optional analyte filtering 
 analyze.filter_analytes(method="MS1")
 ## optional evaluation of image cluster validity  
-analyze.optimize_image_clustering(k_max=min(10, data_analysis.mz.shape[0] - 1))
+analyze.optimize_image_clustering(k_max=min(10, analyze.mz.shape[0] - 1))
 ## optional evaluation of validity of in situ molecular profile 
 analyze.optimize_insitu_clustering(k_max=10)
 ## image clustering with optional 3D t-SNE mapped in situ (if `insitu_tsne=True`)

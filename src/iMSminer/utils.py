@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-iMSminer beta
+iMSminer: A Data Processing and Machine Learning Package for Imaging Mass Spectrometry
 @author: Yu Tin Lin (yutinlin@stanford.edu)
 @author: Haohui Bao (susanab20020911@gmail.com)
 @author: Troy R. Scoggins IV (t.scoggins@ufl.edu)
@@ -736,21 +736,27 @@ def repel_labels(ax, x, y, labels, colors, k=0.01, jitter_factor=100, font_size=
     G = nx.DiGraph()
     data_nodes = []
     init_pos = {}
-    i = 0
-    for xi, yi, label in zip(x, y, labels):
-        data_str = f"data_{i}_label_{label}"
+    label_count = {}
+
+    for i, (xi, yi, label) in enumerate(zip(x, y, labels)):
+        if label in label_count:
+            label_count[label] += 1
+        else:
+            label_count[label] = 1
+
+        unique_label = f"{label}_{label_count[label]}"
+        data_str = f"label_{unique_label}"
+
         G.add_node(data_str)
-        G.add_node(label)
-        G.add_edge(label, data_str)
+        G.add_node(unique_label)
+        G.add_edge(unique_label, data_str)
+
         data_nodes.append(data_str)
         init_pos[data_str] = (xi, yi)
-        init_pos[label] = (xi, yi)
-        i += 1
+        init_pos[unique_label] = (xi, yi)
 
     pos = nx.spring_layout(
         G, pos=init_pos, fixed=data_nodes, k=k * jitter_factor)
-
-    # undo spring_layout's rescaling
     pos_after = np.vstack([pos[d] for d in data_nodes])
     pos_before = np.vstack([init_pos[d] for d in data_nodes])
     scale, shift_x = np.polyfit(pos_after[:, 0], pos_before[:, 0], 1)
@@ -761,10 +767,8 @@ def repel_labels(ax, x, y, labels, colors, k=0.01, jitter_factor=100, font_size=
         pos[key] = (val * scale) + shift
 
     for (label, data_str), color in zip(G.edges(), colors):
-        # displacement = (2*np.exp(np.random.rand(2)) - np.exp(1)) * k
-        # displacement[1] *= 10
         ax.annotate(
-            label,
+            label.split('_')[0],
             xy=pos[data_str],
             xycoords="data",
             xytext=pos[label],
@@ -781,7 +785,7 @@ def repel_labels(ax, x, y, labels, colors, k=0.01, jitter_factor=100, font_size=
             color=color,
             alpha=0.5,
         )
-    # expand limits
+
     all_pos = np.vstack(list(pos.values()))
     x_span, y_span = np.ptp(all_pos, axis=0)
     mins = np.min(all_pos - x_span * 0.15, 0)

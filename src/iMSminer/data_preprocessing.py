@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-iMSminer beta
+iMSminer: A Data Processing and Machine Learning Package for Imaging Mass Spectrometry
 @author: Yu Tin Lin (yutinlin@stanford.edu)
 @author: Haohui Bao (susanab20020911@gmail.com)
 @author: Troy R. Scoggins IV (t.scoggins@ufl.edu)
