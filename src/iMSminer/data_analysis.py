@@ -124,12 +124,12 @@ class DataAnalysis:
             self.jit = False
 
         self.data_dir = input(
-            "Enter directory path containing image datasets: ")
+            "\n\n Enter directory path containing image datasets: \n\n")
 
         fig_ratio_chosen = False
         while not fig_ratio_chosen:
             fig_ratio = input(
-                "Render figures with `small`, `medium`, or `large` ratio? ")
+                "\n\n Render figures with `small`, `medium`, or `large` ratio? \n\n")
             if fig_ratio == "small":
                 self.fig_ratio = 10
                 fig_ratio_chosen = True
@@ -183,9 +183,10 @@ class DataAnalysis:
             img_array_1c = make_image_1c(data_2darray=pd.concat([pd.Series(np.sum(
                 df_build.iloc[:, :-2], axis=1)), df_build.iloc[:, -2:]], axis=1).to_numpy())
             self.img_array_1c = img_array_1c
-            self.ROI_num = int(input("Enter number of ROIs for analysis: "))
+            self.ROI_num = int(
+                input("\n\n Enter number of ROIs for analysis: \n\n"))
             ROIs = input(
-                "Enter labels for ROIs, from left to right, top to bottom? Separate ROI names by one space: ")
+                "\n\n Enter labels for ROIs, from left to right, top to bottom? Separate ROI names by one space: \n\n")
             ROIs = ROIs.split(" ")
 
             # ROI selection
@@ -200,7 +201,7 @@ class DataAnalysis:
                         ROI_dim_array = np.append(
                             ROI_dim_array, ROI_dim.reshape((1, -1)), axis=0)
                     cv2.destroyAllWindows()
-                    ROI_sele = input("Keep ROI selecction? (yes/no) ")
+                    ROI_sele = input("\n\n Keep ROI selecction? (yes/no) \n\n")
                     if ROI_sele == "yes":
                         ROI_exit = True
                     else:
@@ -233,13 +234,13 @@ class DataAnalysis:
                 except:
                     # ROI selection for jupyter notebook and Google colab
                     left = int(
-                        input("Enter lowest value on x (horizontal) coordinate: "))
+                        input("\n\n Enter lowest value on x (horizontal) coordinate: \n\n"))
                     right = int(
-                        input("Enter highest value on x (horizontal) coordinate: "))
+                        input("\n\n Enter highest value on x (horizontal) coordinate: \n\n"))
                     bottom = int(
-                        input("Enter lowest value on y (vertical) coordinate: "))
+                        input("\n\n Enter lowest value on y (vertical) coordinate: \n\n"))
                     top = int(
-                        input("Enter highest value on y (vertical) coordinate: "))
+                        input("\n\n Enter highest value on y (vertical) coordinate: \n\n"))
 
                     ROI_xy = (df_build['x'] >= left) & (df_build['x'] < right) & (
                         df_build['y'] >= bottom) & (df_build['y'] < top)
@@ -282,9 +283,9 @@ class DataAnalysis:
         exit_regression = False
         while not exit_regression:
             degree = int(
-                input("Enter the degree of linear model for polynomial calibration. Enter an integer: "))
+                input("\n\n Enter the degree of linear model for polynomial calibration. Enter an integer: \n\n"))
             reference_mz = input(
-                "Enter reference m/z's for calibration. Separate each reference m/z by one space: ")
+                "\n\n Enter reference m/z's for calibration. Separate each reference m/z by one space: \n\n")
             reference_mz = reference_mz.split(" ")
             reference_mz = np.asarray(reference_mz).astype(np.float32)
             resid_index = np.argmin(
@@ -320,7 +321,7 @@ class DataAnalysis:
             plt.show()
 
             calibration_exit = input(
-                "Accept changes to calibration? (yes/no/exit) ")
+                "\n\n Accept changes to calibration? (yes/no/exit) \n\n")
             if calibration_exit == "yes":
                 self.mz -= resid_predicted
                 fig.savefig(
@@ -356,31 +357,31 @@ class DataAnalysis:
             Percent available RAM to define size of chunking, by deafult 5
         """
         ion_type = input(
-            "Enter ion types of interest. Separate each ion type by one space: ")
+            "\n\n Enter ion types of interest. Separate each ion type by one space: \n\n")
         self.ion_type = ion_type.split(" ")
         mass_diff = input(
-            "Enter the corresponding mass difference of ion type(s) of interest. List ion types in same order as previously and separate each ion type by one space: ")
+            "\n\n Enter the corresponding mass difference of ion type(s) of interest. List ion types in same order as previously and separate each ion type by one space: \n\n")
         mass_diff = mass_diff.split(" ")
         self.mass_diff = np.asarray(mass_diff).astype(np.float32)
 
         MS1_db_path = input(
-            "Enter file path of MS1 database in csv format: ")
+            "\n\n Enter file path of MS1 database in csv format: \n\n")
         mz_col = int(input(
-            "Enter column in MS1 database that corresponds to neurtral monoisotopic masses: ")) - 1
+            "\n\n Enter column in MS1 database that corresponds to neurtral monoisotopic masses: \n\n")) - 1
         print("Importing MS1 database. . .")
         MS1_db = pd.read_csv(MS1_db_path)
         print("Finished importing MS1 database!")
         print(f"The columns of imported database are {MS1_db.columns}")
 
         filter_db = str2bool(
-            input("Filter database? Recommended for speed. Enter (yes / no) "))
+            input("\n\n Filter database? Recommended for speed. Enter (yes / no) \n\n"))
 
         # reduce database
         if filter_db:
             self.col_filter = int(
-                input("Which column [number] in database to perform filtering? ")) - 1
+                input("\n\n Which column [number] in database to perform filtering? \n\n")) - 1
             filter_by = input(
-                f"Enter the groups of interest for filtering column {self.col_filter+1} in MS1 database. Separate each group by one space: ")
+                f"\n\n Enter the groups of interest for filtering column {self.col_filter+1} in MS1 database. Separate each group by one space: \n\n")
             self.filter_by = filter_by.split(" ")
             MS1_db = MS1_db.loc[MS1_db.iloc[:, self.col_filter].str.contains(
                 '|'.join(self.filter_by))]
@@ -407,7 +408,8 @@ class DataAnalysis:
                         [int(analyte_pointer), ppm[analyte_pointer, ion_index]], MS1_db_array[ion_index])
                     all_rows.append(combined_row)
         elif MS1_search_method == "multi_spectrum":
-            mz_list_path = input("Enter the file path of list of m/z's: ")
+            mz_list_path = input(
+                "\n\n Enter the file path of list of m/z's: \n\n")
             mz = pd.read_csv(mz_list_path)
             analyte_index = np.repeat(np.arange(mz.shape[0]), mz.shape[1]).reshape(
                 [-1, 1]).astype(np.float32)
@@ -471,19 +473,19 @@ class DataAnalysis:
         if method == "MS1":
             pass
         elif method == "MS2":
-            MS2_path = input("Enter file path of MS2 results: ")
+            MS2_path = input("\n\n Enter file path of MS2 results: \n\n")
             MS2_results = pd.read_csv(MS2_path)
 
             if not any(self.ms1_df.columns == "adduct"):
                 ion_type = np.unique(self.ms1_df['ion_type'])
                 adduct_mapping = input(
-                    f"Map {ion_type} to the following. Separate each value by one space: ")
+                    f"\n\n Map {ion_type} to the following. Separate each value by one space: \n\n")
                 adduct_mapping = adduct_mapping.split(" ")
                 mapping_dict = dict(zip(ion_type, adduct_mapping))
                 self.ms1_df['adduct'] = self.ms1_df['ion_type'].replace(
                     mapping_dict).fillna('unknown')
-            analyte_col = int(input(f"Enter column number that corresponds to analyte IDs. The columns are \n"
-                              f"{self.ms1_df.columns}: ")) - 1
+            analyte_col = int(input(f"\n\n Enter column number that corresponds to analyte IDs. The columns are \n"
+                              f"{self.ms1_df.columns}: \n\n")) - 1
 
             self.ms1_df = pd.merge(self.ms1_df, MS2_results, left_on=[f'{self.ms1_df.columns[analyte_col]}', 'adduct'], right_on=[
                                    'bulk_ID', 'adduct'], how='inner', suffixes=('', '_ms2'))
@@ -492,20 +494,20 @@ class DataAnalysis:
         elif method == "analyte_class":
             print(f"The columns in MS1 dataframe are {self.ms1_df.columns}")
             class_col = int(input(
-                f"Enter column [number] in MS1 dataframe corresponds to analyte class? The columns are \n"
-                f"{self.ms1_df.columns}: ")) - 1
+                f"\n\n Enter column [number] in MS1 dataframe corresponds to analyte class? The columns are \n"
+                f"{self.ms1_df.columns}: \n\n")) - 1
             analyte_class = input(
-                "Enter analyte classes of interest. Separate each analyte class by one space: ")
+                "\n\n Enter analyte classes of interest. Separate each analyte class by one space: \n\n")
             self.analyte_class = analyte_class.split(" ")
             self.ms1_df.loc[self.ms1_df.iloc[:, class_col].str.contains(
                 '|'.join(analyte_class))].reset_index(drop=True, inplace=True)
         elif method == "ion_type":
             print(f"The columns in MS1 dataframe are {self.ms1_df.columns}")
             ion_col = int(
-                input(f"Enter column [number] MS1 dataframe that corresponds to ion type. The columns are \n"
-                      f"{self.ms1_df.columns}: ")) - 1
+                input(f"\n\n Enter column [number] MS1 dataframe that corresponds to ion type. The columns are \n"
+                      f"{self.ms1_df.columns}: \n\n")) - 1
             ion_type = input(
-                "Enter ion types of interest. Separate each ion type by one space: ")
+                "\n\n Enter ion types of interest. Separate each ion type by one space: \n\n")
             self.ms1_df.loc[self.ms1_df.iloc[:, ion_col].str.contains(
                 '|'.join(ion_type))].reset_index(drop=True, inplace=True)
         else:
@@ -552,7 +554,8 @@ class DataAnalysis:
         elif method == "reference":
             print(
                 "Pixels with reference intensity = 0 are normalized on the reference mean")
-            mz_reference = float(input("Enter m/z of reference mass: "))
+            mz_reference = float(
+                input("\n\n Enter m/z of reference mass: \n\n"))
             ref_col = np.argmin(np.abs(self.mz - mz_reference))
             self.df_pixel_all.iloc[:, :truncate_col] = self.df_pixel_all.iloc[:, :truncate_col].div(
                 self.df_pixel_all.iloc[:, ref_col].apply(lambda x: self.df_pixel_all.iloc[:, ref_col].mean() if x == 0 else x), axis=0
@@ -597,7 +600,7 @@ class DataAnalysis:
         if not os.path.exists(f"{self.data_dir}/figures/ion_image"):
             os.makedirs(f"{self.data_dir}/figures/ion_image")
         resolution = float(
-            input("Enter spatial resolution of imaging [microns]: "))
+            input("\n\n Enter spatial resolution of imaging [microns]: \n\n"))
 
         plt.style.use('default')
 
@@ -691,7 +694,7 @@ class DataAnalysis:
             fig.add_artist(line)
             resolution_plt = resolution * \
                 max(round(
-                    np.max(ROI_info['right']-ROI_info['left'])*(line_x_end-line_x_start), 0)*self.ROI_num, 1)
+                    np.max(ROI_info['right']-ROI_info['left'])*(line_x_end-line_x_start)*self.ROI_num, 0), 1)
             fig.text((line_x_start + line_x_end) / 2, line_y + 0.02, f'{resolution_plt: .0f} $\mu$m',
                      ha='center', va='center', color='white', fontsize=ROI_label_size/2)
             plt.savefig(f"{self.data_dir}/figures/ion_image/mz_{self.mz[analyte]: .3f}_replicate{replicate}.png",
@@ -761,8 +764,14 @@ class DataAnalysis:
 
         plt.style.use('default')
         if feature_label == "analyte":
-            analyte_col = int(input(f"Enter column number that corresponds to analyte IDs. \n"
-                                    f"The columns are {self.ms1_df.columns}: ")) - 1
+            analyte_col = int(input(f"\n\n Enter column number that corresponds to analyte IDs. \n"
+                                    f"The columns are {self.ms1_df.columns}: \n\n")) - 1
+        if legend_label == "analyte_class":
+            self.vp_class_colnum = int(input(
+                f"\n\n Enter column [number] containing classes of analytes to label in legend of volcano plot. \n\n The columns are {self.ms1_df.columns}: \n\n")) - 1
+            self.analyte_class_VP = input(
+                "\n\n Enter classes of analytes to label in legend of volcano plot. Separate each class by one space: \n\n")
+            self.analyte_class_VP = self.analyte_class_VP.split(" ")
 
         # prepare dataframe for p-value and FC computations
         self.df_mean_all = self.df_pixel_all.groupby(
@@ -772,7 +781,7 @@ class DataAnalysis:
                                             != 'placeholder']
         if self.df_mean_all['ROI'].shape[0] < 2:
             warnings.warn("Needs at least 2 ROIs.", RuntimeWarning)
-        # return None
+            return None
 
         df_mean_all_long = pd.melt(self.df_mean_all, id_vars=[
             'ROI', 'replicate', 'ROI_num', 'x', 'y'], var_name='analyte', value_name='intensity')
@@ -813,7 +822,7 @@ class DataAnalysis:
                 if lm_df.df_resid == 0:
                     warnings.warn(
                         "Insufficient sample size for computing p-values.", RuntimeWarning)
-                #    return None
+                    return None
 
                 anova_df = sm.stats.anova_lm(lm_df, typ=1)
 
@@ -874,8 +883,9 @@ class DataAnalysis:
                 except ValueError:
                     pass
             elif feature_label == "analyte":
-                vp_retain = self.ms1_df.loc[self.ms1_df['analyte'] != exclude_analyte, 'analyte'].to_numpy().astype(
-                    int)
+                ms1_features = self.ms1_df.iloc[:, [
+                    0, analyte_col]].drop_duplicates().to_numpy()
+                vp_retain = ms1_features[:, 0].astype(int)
                 _, vp_retain = np.unique(vp_retain, return_inverse=True)
                 df_vp_mapping = df_vp.iloc[vp_retain]
                 colors = [color for color in colors[vp_retain]]
@@ -883,8 +893,8 @@ class DataAnalysis:
                     abs(df_vp_mapping['intensity']) > np.log2(FCthreshold))
                 try:
                     repel_labels(ax, df_vp_mapping['intensity'][vp_indices],  df_vp_mapping['p'][vp_indices],
-                                 self.ms1_df.iloc[:, analyte_col][vp_indices.reset_index(
-                                     drop=True)], pd.Series(colors)[vp_indices.reset_index(drop=True)], k=jitter_amount,
+                                 ms1_features[:, 1], pd.Series(
+                                     colors)[vp_indices.reset_index(drop=True)], k=jitter_amount,
                                  jitter_factor=jitter_factor, font_size=font_size)
                 except ValueError:
                     pass
@@ -937,7 +947,7 @@ class DataAnalysis:
                 df_hm.set_index(self.mz[df_hm.index.to_numpy()], inplace=True)
             elif hm_label == "analyte":
                 ID_col = int(input(
-                    f"Enter the column [number] to use for labeling analytes in heatmap. The columns are {self.ms1_df.columns}: ")) - 1
+                    f"\n\n Enter the column [number] to use for labeling analytes in heatmap. The columns are {self.ms1_df.columns}: \n\n")) - 1
                 df_hm = df_hm.iloc[self.ms1_df['analyte'].to_numpy().astype(
                     int)]
                 df_hm.set_index(self.ms1_df.iloc[:, ID_col], inplace=True)
@@ -967,9 +977,9 @@ class DataAnalysis:
                 ax.set_xticklabels(df_hm.columns, rotation=90)
             elif hm_label == "analyte":
                 self.col_sep = int(input(
-                    f"Enter the column [number] that contains the groups of interest. The columns are {self.ms1_df.columns}: ")) - 1
+                    f"\n\n Enter the column [number] that contains the groups of interest. The columns are {self.ms1_df.columns}: \n\n")) - 1
                 filter_by = input(
-                    f"Enter the groups of interest from {self.col_sep+1}. Separate each group by one space: ")
+                    f"\n\n Enter the groups of interest from {self.col_sep+1}. Separate each group by one space: \n\n")
                 self.filter_by = filter_by.split(" ")
                 gs = GridSpec(1, len(self.filter_by) + 1, width_ratios=[1]*len(
                     self.filter_by) + [0.1], figure=fig, wspace=hm_wspace)
@@ -1000,7 +1010,6 @@ class DataAnalysis:
             plt.savefig(f"{self.data_dir}/figures/volcano/heatmap",
                         dpi=100, bbox_inches='tight')
             plt.show()
-            
 
     def insitu_clustering(
             self,
@@ -1036,7 +1045,7 @@ class DataAnalysis:
             Renders a RGB in situ representation of 3D t-SNE embedding if `insitu_tsne = True`, by default False
         """
         resolution = float(
-            input("Enter spatial resolution of imaging [microns]: "))
+            input("\n\n Enter spatial resolution of imaging [microns]: \n\n"))
         if not os.path.exists(f"{self.data_dir}/figures"):
             os.makedirs(f"{self.data_dir}/figures")
         if not os.path.exists(f"{self.data_dir}/figures/insitu_cluster"):
@@ -1062,7 +1071,7 @@ class DataAnalysis:
         num_iters = 1000
 
         if self.gpu == False:
-            print("Spatial segmentation on CPU. Computing time may be long.")
+            print("In situ segmentation on CPU. Computing time may be long.")
             from sklearn.cluster import KMeans
             from sklearn.manifold import TSNE
 
@@ -1078,7 +1087,7 @@ class DataAnalysis:
 
         elif self.gpu == True:
             try:
-                print("Spatial segmentation on GPU.")
+                print("In situ segmentation on GPU.")
                 from cuml import using_output_type
                 from cuml.cluster import KMeans
                 from cuml.manifold import TSNE
@@ -1097,7 +1106,7 @@ class DataAnalysis:
 
             except:
                 print("GPU error. Defaulting to CPU.")
-                print("Spatial segmentation on CPU. Computing time may be long.")
+                print("In situ segmentation on CPU. Computing time may be long.")
                 from sklearn.cluster import KMeans
                 from sklearn.manifold import TSNE
                 k_means = KMeans(n_clusters=self.k, init="k-means++", random_state=0,
@@ -1117,7 +1126,7 @@ class DataAnalysis:
         cmap = plt.cm.get_cmap('rainbow', len(np.unique(kmeans_labels)))
         for i, label in enumerate(np.unique(kmeans_labels)):
             plt.scatter(tsne_embedding[kmeans_labels == label, 0], tsne_embedding[kmeans_labels == label, 1],
-                        c=cmap(i),
+                        color=cmap(i),
                         alpha=0.6, label=f'Cluster {label}')
 
         plt.title(
@@ -1227,7 +1236,7 @@ class DataAnalysis:
         fig.add_artist(line)
         resolution_plt = resolution * \
             max(round(
-                np.max(ROI_info['right']-ROI_info['left'])*(line_x_end-line_x_start), 0)*self.ROI_num, 1)
+                np.max(ROI_info['right']-ROI_info['left'])*(line_x_end-line_x_start)*self.ROI_num, 0), 1)
         fig.text((line_x_start + line_x_end) / 2, line_y + 0.02,
                  f'{resolution_plt:.0f} $\mu$m', ha='center', va='center', color='white', fontsize=ROI_label_size/2)
 
@@ -1271,7 +1280,7 @@ class DataAnalysis:
         for k in range(2, k_max+1):
             self.k = k
             if self.gpu == False:
-                print("In situ clustering on CPU. Computing time may be long.")
+                print("In situ segmentation on CPU. Computing time may be long.")
                 from sklearn.cluster import KMeans
                 k_means = KMeans(n_clusters=self.k, init="k-means++", random_state=0,
                                  n_init="auto", max_iter=num_iters).fit(df_pixel_all_max.iloc[:, :truncate_col])
@@ -1279,7 +1288,7 @@ class DataAnalysis:
 
             elif self.gpu == True:
                 try:
-                    print("Image clustering on GPU.")
+                    print("In situ segmentation on GPU.")
                     from cuml import using_output_type
                     from cuml.cluster import KMeans
                     with using_output_type('numpy'):
@@ -1290,7 +1299,7 @@ class DataAnalysis:
 
                 except:
                     print("GPU error. Defaulting to CPU.")
-                    print("Image clustering on CPU. Computing time may be long.")
+                    print("In situ segmentation on CPU. Computing time may be long.")
                     from sklearn.cluster import KMeans
                     k_means = KMeans(n_clusters=self.k, init="k-means++", random_state=0,
                                      n_init="auto", max_iter=num_iters).fit(df_pixel_all_max.iloc[:, :truncate_col])
@@ -1383,12 +1392,12 @@ class DataAnalysis:
         if not os.path.exists(f"{self.data_dir}/figures/image_cluster"):
             os.makedirs(f"{self.data_dir}/figures/image_cluster")
         if feature_label == "analyte":
-            analyte_col = int(input(f"Enter column number that corresponds to analyte IDs. The columns are \n"
-                              f"{self.ms1_df.columns}: ")) - 1
+            analyte_col = int(input(f"\n\n Enter column number that corresponds to analyte IDs. The columns are \n"
+                              f"{self.ms1_df.columns}: \n\n")) - 1
 
         plt.style.use('default')
         resolution = float(
-            input("Enter spatial resolution of imaging [microns]: "))
+            input("\n\n Enter spatial resolution of imaging [microns]: \n\n"))
 
         self.k = k
         self.perplexity = perplexity
@@ -1485,7 +1494,7 @@ class DataAnalysis:
             i) for i, label in enumerate(np.unique(kmeans_labels))}
         for i, label in enumerate(np.unique(kmeans_labels)):
             ax.scatter(tsne_embedding[kmeans_labels == label, 0], tsne_embedding[kmeans_labels == label, 1],
-                       c=cmap(i),
+                       color=cmap(i),
                        alpha=1, label=f'Cluster {label}', s=50)
         if feature_label == "mz":
             flat_colors = [label_to_color[label] for label in kmeans_labels]
@@ -1802,7 +1811,7 @@ class DataAnalysis:
                 fig.add_artist(line)
                 resolution_plt = resolution * \
                     max(round(
-                        np.max(ROI_info['right']-ROI_info['left'])*(line_x_end-line_x_start), 0)*self.ROI_num, 1)
+                        np.max(ROI_info['right']-ROI_info['left'])*(line_x_end-line_x_start)*self.ROI_num, 0), 1)
                 fig.text((line_x_start + line_x_end) / 2, line_y + 0.02,
                          f'{resolution_plt: .0f} $\mu$m', ha='center', va='center', color='white', fontsize=ROI_label_size/2)
                 plt.savefig(f"{self.data_dir}/figures/image_cluster/mean_image_cluster\n"

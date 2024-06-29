@@ -744,7 +744,7 @@ def repel_labels(ax, x, y, labels, colors, k=0.01, jitter_factor=100, font_size=
         else:
             label_count[label] = 1
 
-        unique_label = f"{label}_{label_count[label]}"
+        unique_label = f"{label}_-_{label_count[label]}"
         data_str = f"label_{unique_label}"
 
         G.add_node(data_str)
@@ -768,7 +768,7 @@ def repel_labels(ax, x, y, labels, colors, k=0.01, jitter_factor=100, font_size=
 
     for (label, data_str), color in zip(G.edges(), colors):
         ax.annotate(
-            label.split('_')[0],
+            label.split('_-_')[0],
             xy=pos[data_str],
             xycoords="data",
             xytext=pos[label],
