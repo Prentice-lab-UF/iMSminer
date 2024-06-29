@@ -70,29 +70,30 @@ def prompt_func(self, attr_name):
     """
     prompts = {
         "dist": lambda: int(
-            input("Enter the minimum number of data points between near-isobars: ")
+            input(
+                "\n\n Enter the minimum number of data points between near-isobars: \n\n")
         ),
         "loq": lambda: float(
             input(
-                "What is your limit of quantification? Enter a coefficient k such that LOQ = k * noise: "
+                "\n\n What is your limit of quantification? Enter a coefficient k such that LOQ = k * noise: \n\n"
             )
         ),
         "pp_dataset": lambda: input(
-            "Enter dataset name (without '') to perform peak picking on: "
+            "\n\n Enter dataset name (without '') to perform peak picking on: \n\n"
         ),
-        "lwr": lambda: float(input("Enter a lower m/z bound of noise: ")),
-        "upr": lambda: float(input("Enter an upper m/z bound of noise: ")),
+        "lwr": lambda: float(input("\n\n Enter a lower m/z bound of noise: \n\n")),
+        "upr": lambda: float(input("\n\n Enter an upper m/z bound of noise: \n\n")),
         "noise": lambda: float(
             input(
-                "Specify a noise level. Enter a number noise such that LOQ = k * noise: "
+                "\n\n Specify a noise level. Enter a number noise such that LOQ = k * noise: \n\n"
             )
         ),
         "z_score": lambda: float(
-            input("Enter a z_score bound for noise classification: ")
+            input("\n\n Enter a z_score bound for noise classification: \n\n")
         ),
-        "RP": lambda: float(input("Specify FWHF: ")),
-        "mz_RP": lambda: float(input("Specify the m/z where FWHF was calculated: ")),
-        "rp_factor": lambda: float(input("Scale number of bins by a number: ")),
+        "RP": lambda: float(input("\n\n Specify FWHF: \n\n")),
+        "mz_RP": lambda: float(input("\n\n Specify the m/z where FWHF was calculated: \n\n")),
+        "rp_factor": lambda: float(input("\n\n Scale number of bins by a number: \n\n")),
     }
     return prompts[attr_name]()
 
@@ -135,9 +136,9 @@ class Preprocess:
 
     def __init__(self):
         self.directory = input(
-            "Enter the directory of imzML files to process: ")
+            "\n\n Enter the directory of imzML files to process: \n\n")
         self.data_dir = input(
-            "Enter a directory path for saving preprocessed data: ")
+            "\n\n Enter a directory path for saving preprocessed data: \n\n")
 
         test_library = ["cupy"]
         for lib in test_library:
@@ -168,33 +169,34 @@ class Preprocess:
         attributes = {
             "dist": lambda: int(
                 input(
-                    "Enter the minimum number of data points required to discern closely-spaced peaks: "
+                    "\n\n Enter the minimum number of data points required to discern closely-spaced peaks: \n\n"
                 )
             ),
             "loq": lambda: float(
                 input(
-                    "Specify an intensity threshold for peak picking. Enter a coefficient k such that threshold = k * noise: "
+                    "\n\n Specify an intensity threshold for peak picking. Enter a coefficient k such that threshold = k * noise: \n\n"
                 )
             ),
             "pp_dataset": lambda: (
-                input("Enter dataset name (without '') to perform peak picking on: ")
+                input(
+                    "\n\n Enter dataset name (without '') to perform peak picking on: \n\n")
                 if self.datasets.shape[0] > 1
                 else self.datasets[0]
             ),
             "lwr": lambda: (
-                float(input("Enter a lower m/z bound of noise: "))
+                float(input("\n\n Enter a lower m/z bound of noise: \n\n"))
                 if self.pp_method == "point"
                 else None
             ),
             "upr": lambda: (
-                float(input("Enter an upper m/z bound of noise: "))
+                float(input("\n\n Enter an upper m/z bound of noise: \n\n"))
                 if self.pp_method == "point"
                 else None
             ),
             "noise": lambda: (
                 float(
                     input(
-                        "Specify a noise level. Enter a number noise such that LOQ = k * noise: "
+                        "\n\n Specify a noise level. Enter a number noise such that LOQ = k * noise: \n\n"
                     )
                 )
                 if self.pp_method == "specify_noise"
@@ -203,7 +205,7 @@ class Preprocess:
             "z_score": lambda: (
                 float(
                     input(
-                        "Enter a z_score bound (number of standard deviations) for noise classification: "
+                        "\n\n Enter a z_score bound (number of standard deviations) for noise classification: \n\n"
                     )
                 )
                 if self.pp_method in ["automatic", "binning_even", "binning_regression"]
@@ -213,15 +215,15 @@ class Preprocess:
         if self.pp_method in ["binning_even", "binning_regression"]:
             attributes.update(
                 {
-                    "RP": lambda: float(input("Specify the resolving power (FWHM): ")),
+                    "RP": lambda: float(input("\n\n Specify the resolving power (FWHM): \n\n")),
                     "mz_RP": lambda: float(
                         input(
-                            "Specify the m/z at which resolving power was calculated: "
+                            "\n\n Specify the m/z at which resolving power was calculated: \n\n"
                         )
                     ),
                     "rp_factor": lambda: float(
                         input(
-                            "Scale number of m/z bins up or down by a coefficient k (i.e., k * (m/z range of MS analysis) * FWHM / (m/z) = number of bins): "
+                            "\n\n Scale number of m/z bins up or down by a coefficient k (i.e., k * (m/z range of MS analysis) * FWHM / (m/z) = number of bins): \n\n"
                         )
                     ),
                 }
@@ -585,7 +587,7 @@ class Preprocess:
             self.baseline_subtract = False
             if self.pp_method not in ["binning_even", "binning_regression"]:
                 self.pp_method = input(
-                    "Select binning method: `binning_even` or `binning_regression`. Use `binning_regression`, which requires simple linear regression equation from original data, for more optimal mass resolution. "
+                    "\n\n Select binning method: `binning_even` or `binning_regression`. Use `binning_regression`, which requires simple linear regression equation from original data, for more optimal mass resolution. \n\n"
                 )
             self.check_attributes()
             self.p = ImzMLParser(f"{self.directory}/{self.pp_dataset}")
@@ -678,17 +680,17 @@ class Preprocess:
                     )
 
                     resolution_progress = input(
-                        "Satisfied with resolution? (yes/no) ")
+                        "\n\n Satisfied with resolution? (yes/no) \n\n")
                     if resolution_progress == "yes":
                         resolution_exit = True
                     else:
                         resolution_exit = False
                         self.rp_factor = float(
-                            input("Scale number of bins by a number: ")
+                            input("\n\n Scale number of bins by a number: \n\n")
                         )
                         self.dist = int(
                             input(
-                                "What is the minimum number of data points between peaks? "
+                                "\n\n What is the minimum number of data points between peaks? \n\n"
                             )
                         )
 
@@ -700,12 +702,12 @@ class Preprocess:
                     ols_exit = False
                     while not ols_exit:
                         regression_eq = input(
-                            "Specify a simple linear regression equation of intercept + coefficient. Enter: intercept{one space}coefficient "
+                            "\n\n Specify a simple linear regression equation of intercept + coefficient. Enter intercept{one space}coefficient: \n\n"
                         )
                         regression_eq = regression_eq.split(" ")
                         if len(regression_eq) != 2:
                             print(
-                                "Must enter a simple linear regression equation with an intercept and a coefficient for slope. ")
+                                "\n\n Must enter a simple linear regression equation with an intercept and a coefficient for slope. \n\n")
                             ols_exit = False
                         else:
                             ols_exit = True
@@ -866,17 +868,17 @@ class Preprocess:
                     )
 
                     resolution_progress = input(
-                        "Satisfied with resolution? (yes/no) ")
+                        "\n\n Satisfied with resolution? (yes/no) \n\n")
                     if resolution_progress == "yes":
                         resolution_exit = True
                     else:
                         resolution_exit = False
                         self.rp_factor = float(
-                            input("Scale number of bins by a number: ")
+                            input("\n\n Scale number of bins by a number: \n\n")
                         )
                         self.dist = int(
                             input(
-                                "What is the minimum number of data points between peaks? "
+                                "\n\n What is the minimum number of data points between peaks? \n\n"
                             )
                         )
 
@@ -1109,7 +1111,7 @@ class Preprocess:
                             scipy.stats.zscore(self.noise_array)) < 2
                         degree = int(
                             input(
-                                "Enter degree of regression for baseline computation: "
+                                "\n\n Enter degree of regression for baseline computation: \n\n"
                             )
                         )
                         poly = PolynomialFeatures(
@@ -1152,14 +1154,14 @@ class Preprocess:
                         plt.show()
 
                         baseline_exit = input(
-                            "Satisfied with baseline subtraction? Enter (yes / no): "
+                            "\n\n Satisfied with baseline subtraction? Enter (yes / no): \n\n"
                         )
                         baseline_exit = str2bool(baseline_exit)
                     self.baseline_pred = baseline_pred
                 elif self.baseline_method == "noise":
                     baseline_factor = float(
                         input(
-                            "Enter a coefficient k for baseline, such that baseline = k * noise: "
+                            "\n\n Enter a coefficient k for baseline, such that baseline = k * noise: \n\n"
                         )
                     )
                     self.baseline_pred = self.noise * baseline_factor
