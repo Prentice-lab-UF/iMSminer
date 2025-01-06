@@ -8,6 +8,7 @@ iMSminer: A Data Processing and Machine Learning Package for Imaging Mass Spectr
 License: Apache-2.0 
 """
 
+import functools
 import gc
 import logging
 import time
@@ -28,10 +29,60 @@ from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 from numba import jit
 from scipy.signal import find_peaks, peak_widths
 
+
+
+logging.basicConfig(level=logging.INFO)
+LOGGER = logging.getLogger(__name__)
+
+def requires_cupy():
+    """
+    Cupy import decorator for function or class
+    """
+    def decorator(obj):
+        if isinstance(obj, type):
+            # Handling class decoration
+            original_init = obj.__init__
+
+            @functools.wraps(original_init)
+            def new_init(self, *args, **kwargs):
+                if cp is not None:
+                    return original_init(self, *args, **kwargs)
+                else:
+                    warnings.warn(
+                        f"The class '{obj.__name__}' requires CuPy, which is not installed. "
+                        f"Instantiating without GPU acceleration.",
+                        UserWarning
+                    )
+
+            obj.__init__ = new_init
+            return obj
+
+        elif callable(obj):
+            # Handling function decoration
+            @functools.wraps(obj)
+            def wrapper(*args, **kwargs):
+                if cp is not None:
+                    return obj(*args, **kwargs)
+                else:
+                    warnings.warn(
+                        f"The function '{obj.__name__}' requires CuPy, which is not installed. "
+                        f"Function execution is skipped.",
+                        UserWarning
+                    )
+                    return None
+            return wrapper
+
+        else:
+            raise TypeError("The @requires_cupy decorator can only be applied to functions or classes.")
+
+    return decorator
+
+
 try:
     import cupy as cp
-except ModuleNotFoundError:
-    pass
+    print("CuPy is installed and imported successfully! GPU acceleration is enabled.")
+except ImportError:
+    print("CuPy is not installed or could not be imported. GPU acceleration is disabled.")
 
 
 def significance(pvalue):
@@ -953,6 +1004,7 @@ def generate_function(method, x, y):
     return interpolate.interp1d(x, y, method, bounds_error=False, fill_value=0)
 
 
+@requires_cupy()
 def create_interpolator(xp, fp, left=None, right=None, period=None):
     """
     Creates an interpolator function for given control points and their values. Codes from https://github.com/lukasz-migas/msalign
@@ -1009,6 +1061,7 @@ def convert_peak_values_to_index(x: np.ndarray, peaks) -> List:
     return [find_nearest_index(x, peak) for peak in peaks]
 
 
+@requires_cupy()
 def find_nearest_index_gpu(x: cp.ndarray, value: Union[float, int]):
     """Find index of nearest value. Codes refactored from https://github.com/lukasz-migas/msalign
 
@@ -1027,6 +1080,7 @@ def find_nearest_index_gpu(x: cp.ndarray, value: Union[float, int]):
     return cp.argmin(cp.abs(x - value))
 
 
+@requires_cupy()
 def convert_peak_values_to_index_gpu(x: cp.ndarray, peaks) -> List:
     """Converts non-integer peak values to index value by finding
     the nearest value in the `xvals` array. Codes refactored from https://github.com/lukasz-migas/msalign
@@ -1046,12 +1100,6 @@ def convert_peak_values_to_index_gpu(x: cp.ndarray, peaks) -> List:
     return [find_nearest_index_gpu(x, peak) for peak in peaks]
 
 
-try:
-    import cupy as cp
-
-    print(f"cupy is installed and imported successfully!")
-except ImportError:
-    print(f"cupy is not installed or could not be imported.")
 
 METHODS = ["pchip", "zero", "slinear",
            "quadratic", "cubic", "linear", "gpu_linear"]
@@ -1523,6 +1571,7 @@ class Aligner_CPU:
         return shift(y, -int(shift_value))
 
 
+@requires_cupy()
 class Aligner_GPU:
     """Alignment class refactored from https://github.com/lukasz-migas/msalign
 

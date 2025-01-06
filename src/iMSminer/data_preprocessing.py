@@ -34,12 +34,17 @@ from .utils import (
     str2bool,
 )
 
+
+cp = None
+Aligner_GPU = None
+
 try:
     import cupy as cp
-
     from iMSminer.utils import Aligner_GPU
-except:
-    pass
+    print("CuPy is installed and imported successfully! GPU acceleration is enabled.")
+except ImportError:
+    print("CuPy is not installed or could not be imported. GPU acceleration is disabled.")
+
 
 
 # ========================DATA PROCESSING========================#
@@ -136,22 +141,22 @@ class Preprocess:
 
     def __init__(self):
         self.directory = input(
-            "\n\n Enter the directory of imzML files to process: \n\n")
+            "\n\n Enter the directory of imzML files to process: \n\n"
+        )
         self.data_dir = input(
-            "\n\n Enter a directory path for saving preprocessed data: \n\n")
+            "\n\n Enter a directory path for saving preprocessed data: \n\n"
+        )
 
-        test_library = ["cupy"]
-        for lib in test_library:
-            try:
-                __import__(lib)
-                print(f"{lib.capitalize()} is installed and imported successfully!")
-                self.gpu = True
-            except ImportError:
-                print(
-                    f"{lib.capitalize()} is not installed or could not be imported.")
-                self.gpu = False
-                break
-        # Initialize attributes as type None
+        if cp is not None and Aligner_GPU is not None:
+            self.gpu = True
+        else:
+            self.gpu = False
+
+        if self.gpu:
+            print("GPU acceleration is enabled.")
+        else:
+            print("GPU acceleration is disabled. Using CPU-based processing.")
+
         self.dist = None
         self.loq = None
         self.pp_dataset = None
@@ -356,7 +361,7 @@ class Preprocess:
         self.plot_num_peaks = plot_num_peaks
 
         for dataset in self.datasets:
-            if not self.inhomogeneous:
+            if not hasattr(self, 'inhomogeneous') or not self.inhomogeneous:
                 p = ImzMLParser_chunk(f"{self.directory}/{dataset}")
                 num_chunks, chunk_size_base, chunk_start, remainder = chunk_prep(
                     p, percent_RAM
@@ -382,7 +387,7 @@ class Preprocess:
                 if i != 0:
                     chunk_start += previous_chunk_size
 
-                if not self.inhomogeneous:
+                if not hasattr(self, 'inhomogeneous') or not self.inhomogeneous:
                     chunk_ms_dict = get_chunk_ms_info2(
                         p, chunk_start, chunk_size_temp)
                 else:
@@ -412,7 +417,7 @@ class Preprocess:
                         np.zeros((len(self.p2), 0)), index=chunk_ms_dict["mz"][self.p2]
                     )
 
-                if not self.inhomogeneous:
+                if not hasattr(self, 'inhomogeneous') or not self.inhomogeneous:
                     peak_area_df_temp = integrate_peak(
                         chunk_ms_dict,
                         self.p2,
@@ -890,31 +895,174 @@ class Preprocess:
                 )
                 return
 
-    def peak_alignment_func(self, mz, intensity):
-        """ALigns input intensity array based on peak index or m/z values
+    # def peak_alignment_func(self, mz, intensity):
+    #     """ALigns input intensity array based on peak index or m/z values
 
+    #     Parameters
+    #     ----------
+    #     mz : np.ndarray
+    #         m/z array used in alignment
+    #     intensity : np.ndarray
+    #         Intensity array before alignment
+
+    #     Returns
+    #     -------
+    #     mz : np.ndarray
+    #         m/z array used in alignment
+    #     intensity : np.ndarray
+    #         Aligned intesnsity array
+
+    #     """
+    #     if self.peak_alignment:
+    #         print("aligning . . .")
+    #         if self.gpu:
+    #             gc.collect()
+    #             cp.get_default_memory_pool().free_all_blocks()
+    #             cp.get_default_pinned_memory_pool().free_all_blocks()
+
+    #             if self.align_reduce:
+    #                 reduced_index = [
+    #                     np.arange(
+    #                         val - self.reduce_halfwidth, val + self.reduce_halfwidth, 1
+    #                     )
+    #                     for val in self.p2
+    #                 ]
+    #                 reduced_index = np.concatenate(reduced_index)
+    #                 reduced_index = reduced_index[reduced_index <
+    #                                               self.mzs.shape[0] - 1]
+    #                 alinger = Aligner_GPU(
+    #                     x=mz[reduced_index],
+    #                     peaks=mz[self.p2][
+    #                         self.avg_spectrum[self.p2]
+    #                         > self.align_threshold * self.noise
+    #                     ],
+    #                     array=intensity[:, reduced_index],
+    #                     method="gpu_linear",
+    #                     align_by_index=True,
+    #                     only_shift=True,
+    #                     return_shifts=True,
+    #                     width=10,
+    #                     ratio=10,
+    #                     grid_steps=self.grid_iter_num,
+    #                     shift_range=cp.asarray(
+    #                         [-self.align_halfwidth, self.align_halfwidth]
+    #                     ),
+    #                 )
+
+    #                 alinger.run()
+    #                 aligned_I, shifts = alinger.apply()
+    #                 intensity[:, reduced_index] = aligned_I.get()
+    #             else:
+    #                 alinger = Aligner_GPU(
+    #                     x=mz,
+    #                     peaks=mz[self.p2][
+    #                         self.avg_spectrum[self.p2]
+    #                         > self.align_threshold * self.noise
+    #                     ],
+    #                     array=intensity,
+    #                     method="gpu_linear",
+    #                     align_by_index=True,
+    #                     only_shift=True,
+    #                     return_shifts=True,
+    #                     width=10,
+    #                     ratio=10,
+    #                     grid_steps=self.grid_iter_num,
+    #                     shift_range=cp.asarray(
+    #                         [-self.align_halfwidth, self.align_halfwidth]
+    #                     ),
+    #                 )
+
+    #                 alinger.run()
+    #                 aligned_I, shifts = alinger.apply()
+    #                 intensity = aligned_I.get()
+    #         else:
+    #             if self.align_reduce:
+    #                 reduced_index = [
+    #                     np.arange(
+    #                         val - self.reduce_halfwidth, val + self.reduce_halfwidth, 1
+    #                     )
+    #                     for val in self.p2
+    #                 ]
+    #                 reduced_index = np.concatenate(reduced_index)
+    #                 reduced_index = reduced_index[reduced_index <
+    #                                               self.mzs.shape[0] - 1]
+    #                 alinger = Aligner_CPU(
+    #                     x=mz[reduced_index],
+    #                     peaks=mz[self.p2][
+    #                         self.avg_spectrum[self.p2]
+    #                         > self.align_threshold * self.noise
+    #                     ],
+    #                     array=intensity[:, reduced_index],
+    #                     method="linear",
+    #                     align_by_index=True,
+    #                     only_shift=True,
+    #                     return_shifts=True,
+    #                     width=10,
+    #                     ratio=10,
+    #                     grid_steps=self.grid_iter_num,
+    #                     shift_range=cp.asarray(
+    #                         [-self.align_halfwidth, self.align_halfwidth]
+    #                     ),
+    #                 )
+
+    #                 alinger.run()
+    #                 aligned_I, shifts = alinger.apply()
+    #                 intensity[:, reduced_index] = aligned_I
+    #             else:
+    #                 gc.collect()
+
+    #                 alinger = Aligner_CPU(
+    #                     x=mz,
+    #                     peaks=mz[self.p2][
+    #                         self.avg_spectrum[self.p2]
+    #                         > self.align_threshold * self.noise
+    #                     ],
+    #                     array=intensity,
+    #                     method="linear",
+    #                     align_by_index=True,
+    #                     only_shift=False,
+    #                     return_shifts=True,
+    #                     width=10,
+    #                     ratio=10,
+    #                     grid_steps=self.grid_iter_num,
+    #                     shift_range=np.asarray(
+    #                         [-self.align_halfwidth, self.align_halfwidth]
+    #                     ),
+    #                 )
+
+    #                 alinger.run()
+    #                 aligned_I, shifts = alinger.apply()
+    #                 intensity = aligned_I
+
+    #         del aligned_I
+
+    #     return mz, intensity
+    
+    
+    def peak_alignment_func(self, mz, intensity):
+        """Aligns input intensity array based on peak index or m/z values
+    
         Parameters
         ----------
         mz : np.ndarray
             m/z array used in alignment
         intensity : np.ndarray
             Intensity array before alignment
-
+    
         Returns
         -------
         mz : np.ndarray
             m/z array used in alignment
         intensity : np.ndarray
-            Aligned intesnsity array
-
+            Aligned intensity array
         """
         if self.peak_alignment:
-            print("aligning . . .")
-            if self.gpu:
+            print("Aligning . . .")
+            if self.gpu and Aligner_GPU is not None:
                 gc.collect()
                 cp.get_default_memory_pool().free_all_blocks()
                 cp.get_default_pinned_memory_pool().free_all_blocks()
-
+    
                 if self.align_reduce:
                     reduced_index = [
                         np.arange(
@@ -923,13 +1071,11 @@ class Preprocess:
                         for val in self.p2
                     ]
                     reduced_index = np.concatenate(reduced_index)
-                    reduced_index = reduced_index[reduced_index <
-                                                  self.mzs.shape[0] - 1]
+                    reduced_index = reduced_index[reduced_index < self.mzs.shape[0] - 1]
                     alinger = Aligner_GPU(
                         x=mz[reduced_index],
                         peaks=mz[self.p2][
-                            self.avg_spectrum[self.p2]
-                            > self.align_threshold * self.noise
+                            self.avg_spectrum[self.p2] > self.align_threshold * self.noise
                         ],
                         array=intensity[:, reduced_index],
                         method="gpu_linear",
@@ -939,11 +1085,9 @@ class Preprocess:
                         width=10,
                         ratio=10,
                         grid_steps=self.grid_iter_num,
-                        shift_range=cp.asarray(
-                            [-self.align_halfwidth, self.align_halfwidth]
-                        ),
+                        shift_range=cp.asarray([-self.align_halfwidth, self.align_halfwidth]),
                     )
-
+    
                     alinger.run()
                     aligned_I, shifts = alinger.apply()
                     intensity[:, reduced_index] = aligned_I.get()
@@ -951,8 +1095,7 @@ class Preprocess:
                     alinger = Aligner_GPU(
                         x=mz,
                         peaks=mz[self.p2][
-                            self.avg_spectrum[self.p2]
-                            > self.align_threshold * self.noise
+                            self.avg_spectrum[self.p2] > self.align_threshold * self.noise
                         ],
                         array=intensity,
                         method="gpu_linear",
@@ -962,11 +1105,9 @@ class Preprocess:
                         width=10,
                         ratio=10,
                         grid_steps=self.grid_iter_num,
-                        shift_range=cp.asarray(
-                            [-self.align_halfwidth, self.align_halfwidth]
-                        ),
+                        shift_range=cp.asarray([-self.align_halfwidth, self.align_halfwidth]),
                     )
-
+    
                     alinger.run()
                     aligned_I, shifts = alinger.apply()
                     intensity = aligned_I.get()
@@ -979,13 +1120,11 @@ class Preprocess:
                         for val in self.p2
                     ]
                     reduced_index = np.concatenate(reduced_index)
-                    reduced_index = reduced_index[reduced_index <
-                                                  self.mzs.shape[0] - 1]
+                    reduced_index = reduced_index[reduced_index < self.mzs.shape[0] - 1]
                     alinger = Aligner_CPU(
                         x=mz[reduced_index],
                         peaks=mz[self.p2][
-                            self.avg_spectrum[self.p2]
-                            > self.align_threshold * self.noise
+                            self.avg_spectrum[self.p2] > self.align_threshold * self.noise
                         ],
                         array=intensity[:, reduced_index],
                         method="linear",
@@ -995,22 +1134,19 @@ class Preprocess:
                         width=10,
                         ratio=10,
                         grid_steps=self.grid_iter_num,
-                        shift_range=cp.asarray(
-                            [-self.align_halfwidth, self.align_halfwidth]
-                        ),
+                        shift_range=np.asarray([-self.align_halfwidth, self.align_halfwidth]),
                     )
-
+    
                     alinger.run()
                     aligned_I, shifts = alinger.apply()
                     intensity[:, reduced_index] = aligned_I
                 else:
                     gc.collect()
-
+    
                     alinger = Aligner_CPU(
                         x=mz,
                         peaks=mz[self.p2][
-                            self.avg_spectrum[self.p2]
-                            > self.align_threshold * self.noise
+                            self.avg_spectrum[self.p2] > self.align_threshold * self.noise
                         ],
                         array=intensity,
                         method="linear",
@@ -1020,18 +1156,17 @@ class Preprocess:
                         width=10,
                         ratio=10,
                         grid_steps=self.grid_iter_num,
-                        shift_range=np.asarray(
-                            [-self.align_halfwidth, self.align_halfwidth]
-                        ),
+                        shift_range=np.asarray([-self.align_halfwidth, self.align_halfwidth]),
                     )
-
+    
                     alinger.run()
                     aligned_I, shifts = alinger.apply()
                     intensity = aligned_I
-
+    
             del aligned_I
-
+    
         return mz, intensity
+
 
     def get_p2(self):
         """Calculates noise level on average spectrum, performs peak picking, and calculates peak widths for peak integration
