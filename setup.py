@@ -1,6 +1,5 @@
 import pathlib
 
-import setuptools
 from setuptools import find_packages, setup
 
 setuptools.setup(
@@ -14,27 +13,25 @@ setuptools.setup(
     author_email="yutinlin@stanford.edu",
     license="Apache Software License",
     install_requires=[
-        "bokeh>=3.2.1",
-        "opencv-python>=4.5.0",
-        "matplotlib>=3.5.0",
-        "msalign>=0.2.0",
-        "networkx>=3.0.0",
-        "numba>=0.50.1",
-        "numpy>=1.20.4,<1.26.1",
-        "pandas<=1.5.3",
-        "psutil>=5.8.0",
-        "pyimzml>=1.5.4",
-        "scikit-learn>=1.2.2",
-        "scipy>=1.11.4",
-        "seaborn>=0.11.2",
-        "statsmodels>=0.14.0",
-        "statannotations>=0.6.0",
-
+        "bokeh==3.4.1",
+        "opencv-python==4.10.0.84",
+        "matplotlib==3.7.1",
+        "msalign==0.2.0",
+        "networkx==3.2.1",
+        "numba==0.60.0",
+        "numpy==1.26.0",
+        "pandas==1.5.3",
+        "psutil==5.9.0",
+        "pyimzml==1.5.4",
+        "scikit-learn==1.6.0",
+        "scipy==1.14.1",
+        "seaborn==0.11.2",
+        "statsmodels==0.14.2",
     ],
-    classifier=[
+    classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
-        "Programming Language :: Python :: 3"
+        "Programming Language :: Python :: 3",
     ],
     packages=find_packages(where="src"),
     package_dir={"": "src"},
