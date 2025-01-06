@@ -20,15 +20,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import psutil
-import seaborn
-import seaborn as sns
-import sklearn
-import statsmodels.api as sm
 from matplotlib.cm import ScalarMappable
-from matplotlib.colors import Normalize
+from matplotlib.colors import Normalize, BoundaryNorm
 from matplotlib.gridspec import GridSpec
 from matplotlib.lines import Line2D
 from numba import jit
+import scipy.stats as stats
+import seaborn
+import seaborn as sns
+import sklearn
 from sklearn.cluster import KMeans
 from sklearn.linear_model import LinearRegression
 from sklearn.manifold import TSNE
@@ -38,10 +38,11 @@ from sklearn.metrics import (
     silhouette_score,
 )
 from sklearn.preprocessing import PolynomialFeatures
-from statannotations.Annotator import Annotator
+import statsmodels.api as sm
 from statsmodels.formula.api import ols
 
-from .utils import (
+
+from iMSminer.utils import (
     draw_ROI,
     get_MS1_hits,
     make_image_1c,
@@ -51,6 +52,7 @@ from .utils import (
     significance,
     str2bool,
 )
+
 
 
 class DataAnalysis:
@@ -90,6 +92,7 @@ class DataAnalysis:
     df_mean_all : pd.DataFrame
         Dataframe of mean intensities with groups ROIs and replicates
     """
+
 
     def __init__(
             self
@@ -142,6 +145,7 @@ class DataAnalysis:
             else:
                 fig_ratio_chosen = False
                 print("Select one of the options.")
+
 
     def load_preprocessed_data(
             self
@@ -259,6 +263,7 @@ class DataAnalysis:
                             "top", "left", "right", "replicate"]
         self.ROI_info = ROI_edge
 
+
     def calibrate_mz(
             self
     ):
@@ -333,6 +338,7 @@ class DataAnalysis:
             elif calibration_exit == "exit":
                 plt.close(fig)
                 break
+
 
     def MS1_search(
             self,
@@ -454,6 +460,7 @@ class DataAnalysis:
             ).reset_index()
             self.ms1_df['frequency'] *= (np.max(mz[:, 0])+1)/mz.shape[0]*100
 
+
     def filter_analytes(
             self,
             method: str = "MS1"
@@ -527,6 +534,7 @@ class DataAnalysis:
         self.df_pixel_all.columns = np.append(np.arange(truncate_col).astype(
             str), self.df_pixel_all.columns[truncate_col:])
 
+
     def normalize_pixel(
             self,
             method: str = "TIC"
@@ -567,6 +575,7 @@ class DataAnalysis:
         else:
             print("Normalization method not found. Default to no normalization")
             pass
+
 
     def get_ion_image(
             self,
@@ -700,6 +709,7 @@ class DataAnalysis:
             plt.savefig(f"{self.data_dir}/figures/ion_image/mz_{self.mz[analyte]: .3f}_replicate{replicate}.png",
                         bbox_inches='tight')
             plt.show()
+
 
     def make_FC_plot(
             self,
@@ -1011,6 +1021,7 @@ class DataAnalysis:
                         dpi=100, bbox_inches='tight')
             plt.show()
 
+
     def insitu_clustering(
             self,
             k: int = 10,
@@ -1244,6 +1255,7 @@ class DataAnalysis:
             f"{self.data_dir}/figures/insitu_cluster/kmeans_insitu_image", dpi=200)
         plt.show(fig)
 
+
     def optimize_insitu_clustering(
             self,
             k_max: int = 10
@@ -1330,6 +1342,7 @@ class DataAnalysis:
         plt.savefig(
             f"{self.data_dir}/figures/insitu_cluster/insitu_clustering_optimization_plot.png", bbox_inches='tight')
         plt.show()
+
 
     def image_clustering(
             self,
@@ -1651,39 +1664,41 @@ class DataAnalysis:
             for cluster in image_cluster_df_long['cluster'].unique():
                 image_cluster_df_cluster = image_cluster_df_long[
                     image_cluster_df_long['cluster'] == cluster]
-                pvalue = [
-                    sm.stats.anova_lm(
-                        ols('intensity ~ C(ROI)', data=image_cluster_df_cluster.loc[
-                            (image_cluster_df_cluster['ROI'] == combo[0]) |
-                            (image_cluster_df_cluster['ROI'] == combo[1]),
-                            ['ROI', 'intensity']]
-                            ).fit(),
-                        typ=1
-                    )['PR(>F)'][0]
-
-                    for combo in list(combinations(ROI.unique(), 2))
+        
+                roi_list = ROI.unique().tolist()
+                comparisons = [
+                    (roi_list[i], roi_list[i + 1])
+                    for i in range(len(roi_list) - 1)
                 ]
-                model_pairs = [
-                    combo
-                    for combo in list(combinations(ROI.unique(), 2))
-                ]
-
+        
+                pvalues = []
+                for roi1, roi2 in comparisons:
+                    group1 = image_cluster_df_cluster[image_cluster_df_cluster['ROI'] == roi1]['intensity']
+                    group2 = image_cluster_df_cluster[image_cluster_df_cluster['ROI'] == roi2]['intensity']
+                    _, pvalue = stats.ttest_ind(group1, group2)
+                    pvalues.append(pvalue)
+        
                 fig = plt.figure(figsize=(
-                    (10+math.comb(self.ROI_num, 2)/10)/2, (7+math.comb(self.ROI_num, 2)/3)/2))
-                plt.rcParams.update(
-                    {'font.size': (10+math.comb(self.ROI_num, 2)/10)})
+                    (10 + math.comb(self.ROI_num, 2) / 10) / 2, (7 + math.comb(self.ROI_num, 2) / 3) / 2))
+                plt.rcParams.update({'font.size': (10 + math.comb(self.ROI_num, 2) / 10)})
                 ax = fig.add_subplot()
-                sns.boxplot(x="ROI", y="intensity",
-                            data=image_cluster_df_cluster, color='white')
+                sns.barplot(x="ROI", y="intensity",
+                            data=image_cluster_df_cluster, palette="Set2", ci="sd", capsize=0.1)
                 sns.stripplot(x="ROI", y="intensity", data=image_cluster_df_cluster,
-                              color='red', size=4, jitter=True)
-
-                annotator = Annotator(ax, model_pairs, x="ROI",
-                                      y="intensity", data=image_cluster_df_cluster)
-                formatted_pvalues = [f'{significance(p)}' for p in pvalue]
-                annotator.set_custom_annotations(formatted_pvalues)
-                annotator.annotate()
-
+                              color='black', size=4, jitter=True)
+        
+                for (roi1, roi2), pvalue in zip(comparisons, pvalues):
+                    x1 = roi_list.index(roi1)
+                    x2 = roi_list.index(roi2)
+                    y = image_cluster_df_cluster['intensity'].max() * 1.05
+                    h = 0.02
+                    col = "black"
+                    ax.hlines(y=y, xmin=x1, xmax=x2, color=col, lw=1.5)  # Horizontal line for comparison
+                    ax.vlines(x=x1, ymin=y - h, ymax=y, color=col, lw=1.5)  # Left vertical line
+                    ax.vlines(x=x2, ymin=y - h, ymax=y, color=col, lw=1.5)  # Right vertical line
+                    annotation = "ns" if pvalue > 0.05 else "*" if pvalue > 0.01 else "**" if pvalue > 0.001 else "***"
+                    ax.text((x1 + x2) * 0.5, y + 0.01, annotation, ha="center", va="bottom", color=col, fontsize=10)
+        
                 plt.title(f'Mean image of cluster {cluster}', weight='bold')
                 plt.xlabel('ROI', weight='bold')
                 plt.ylabel('Mean Intensity', weight='bold')
@@ -1928,6 +1943,7 @@ class DataAnalysis:
                             f"{cluster_index}.png", bbox_inches='tight')
                 plt.show()
 
+
     def optimize_image_clustering(
         self,
         k_max: int = 10
@@ -2019,85 +2035,69 @@ class DataAnalysis:
             f"{self.data_dir}/figures/image_cluster/image_clustering_optimization_plot.png", bbox_inches='tight')
         plt.show()
 
+
     def make_boxplot(
-            self
+            self,
+            title_fontsize=14,
+            label_fontsize=12,
+            tick_fontsize=12,
+            annotation_fontsize=10
     ):
-        """
-        Box plot comparison of mean ion intensity across ROIs with pairwise statistical comparison. Statistical significance thresholds are represented as `*` if 0.05 > $p$-value $geq$ 0.01, `**` if 0.01 > $p$-value $geq$ 0.001, and `***` if $p$-value $\leq$ 0.001.
-        """
         if not os.path.exists(f"{self.data_dir}/figures"):
             os.makedirs(f"{self.data_dir}/figures")
         if not os.path.exists(f"{self.data_dir}/figures/boxplot"):
             os.makedirs(f"{self.data_dir}/figures/boxplot")
-
-        self.df_mean_all = self.df_pixel_all.groupby(
-            ['ROI', 'replicate', 'ROI_num']).mean().reset_index()
+    
+        self.df_mean_all = self.df_pixel_all.groupby(['ROI', 'replicate', 'ROI_num']).mean().reset_index()
         self.df_mean_all.columns = self.df_mean_all.columns.astype(str)
-        self.df_mean_all = self.df_mean_all[self.df_mean_all['ROI']
-                                            != 'placeholder']
+        self.df_mean_all = self.df_mean_all[self.df_mean_all['ROI'] != 'placeholder']
+    
         if self.df_mean_all['ROI'].shape[0] < 2:
             warnings.warn("Needs at least 2 ROIs.", RuntimeWarning)
             return None
-
+    
         ROI = self.df_mean_all.iloc[:, 0]
-        df_mean_all_long = pd.melt(self.df_mean_all, id_vars=[
-                                   'ROI', 'replicate', 'ROI_num', 'x', 'y'], var_name='analyte', value_name='intensity')
+        df_mean_all_long = pd.melt(self.df_mean_all, id_vars=['ROI', 'replicate', 'ROI_num', 'x', 'y'],
+                                   var_name='analyte', value_name='intensity')
+    
         for analyte in df_mean_all_long['analyte'].unique():
             df_mean_all_analyte = df_mean_all_long[df_mean_all_long['analyte'] == analyte]
-
-            try:
-                df_resid = ols('intensity ~ C(ROI)', data=df_mean_all_analyte.loc[
-                    (df_mean_all_analyte['ROI'] == np.unique(df_mean_all_analyte['ROI'])[0]) |
-                    (df_mean_all_analyte['ROI'] ==
-                     np.unique(df_mean_all_analyte['ROI'])[1]),
-                    ['ROI', 'intensity']]
-                ).fit().df_resid
-                if df_resid == 0:
-                    warnings.warn(
-                        "Insufficient sample size for computing p-values.", RuntimeWarning)
-                    return None
-            except ValueError:
-                warnings.warn(
-                    "Insufficient sample size for computing p-values.", RuntimeWarning)
-                return None
-
-            pvalue = [
-                sm.stats.anova_lm(
-                    ols('intensity ~ C(ROI)', data=df_mean_all_analyte.loc[
-                        (df_mean_all_analyte['ROI'] == combo[0]) |
-                        (df_mean_all_analyte['ROI'] == combo[1]),
-                        ['ROI', 'intensity']]
-                        ).fit(),
-                    typ=1
-                )['PR(>F)'][0]
-
-                for combo in list(combinations(ROI.unique(), 2))
+            max_intensity = df_mean_all_analyte['intensity'].max()
+            df_mean_all_analyte['normalized_intensity'] = df_mean_all_analyte['intensity'] / max_intensity
+    
+            roi_list = ROI.unique().tolist()
+            comparisons = [
+                (roi_list[i], roi_list[i + 1])
+                for i in range(len(roi_list) - 1)
             ]
-            model_pairs = [
-                combo
-                for combo in list(combinations(ROI.unique(), 2))
-            ]
+    
+            pvalues = []
+            for roi1, roi2 in comparisons:
+                group1 = df_mean_all_analyte[df_mean_all_analyte['ROI'] == roi1]['normalized_intensity']
+                group2 = df_mean_all_analyte[df_mean_all_analyte['ROI'] == roi2]['normalized_intensity']
+                _, pvalue = stats.ttest_ind(group1, group2)
+                pvalues.append(pvalue)
+    
             plt.style.use('default')
-            fig = plt.figure(figsize=(
-                (10+math.comb(self.ROI_num, 2)/10)/2, (7+math.comb(self.ROI_num, 2)/3)/2))
-            ax = fig.add_subplot()
-            plt.rcParams.update({'font.size': (7+math.comb(self.ROI_num, 2))})
-
-            sns.boxplot(x="ROI", y="intensity",
-                        data=df_mean_all_analyte, color='white')
-            sns.stripplot(x="ROI", y="intensity", data=df_mean_all_analyte,
-                          color='red', size=4, jitter=True)
-
-            annotator = Annotator(ax, model_pairs, x="ROI",
-                                  y="intensity", data=df_mean_all_analyte)
-            formatted_pvalues = [f'{significance(p)}' for p in pvalue]
-            annotator.set_custom_annotations(formatted_pvalues)
-            annotator.annotate()
-
-            plt.title(f'm/z {self.mz.iloc[int(analyte)]}', weight='bold')
-            plt.xlabel('ROI', weight='bold')
-            plt.ylabel('Mean Intensity', weight='bold')
+            fig, ax = plt.subplots(figsize=(8, 6))
+            sns.barplot(x="ROI", y="normalized_intensity", data=df_mean_all_analyte, palette="Set2", ax=ax, ci="sd", capsize=0.1)
+            sns.stripplot(x="ROI", y="normalized_intensity", data=df_mean_all_analyte, color="black", size=4, jitter=True, ax=ax)
+    
+            for (roi1, roi2), pvalue in zip(comparisons, pvalues):
+                x1 = roi_list.index(roi1)
+                x2 = roi_list.index(roi2)
+                y = 1.05
+                h = 0.02
+                col = "black"
+                ax.plot([x1, x1, x2, x2], [y, y + h, y + h, y], lw=1.5, c=col)
+                annotation = "ns" if pvalue > 0.05 else "*" if pvalue > 0.01 else "**" if pvalue > 0.001 else "***"
+                ax.text((x1 + x2) * 0.5, y + h + 0.01, annotation, ha="center", va="bottom", color=col, fontsize=annotation_fontsize)
+    
+            ax.set_title(f'm/z {self.mz.iloc[int(analyte)]:.3f}', weight="bold", fontsize=title_fontsize)
+            ax.set_xlabel("ROI", weight="bold", fontsize=label_fontsize)
+            ax.set_ylabel("Mean Intensity", weight="bold", fontsize=label_fontsize)
+            ax.tick_params(axis='both', labelsize=tick_fontsize)
+            ax.set_ylim(0, 1.2)
             plt.tight_layout()
-            plt.savefig(
-                f"{self.data_dir}/figures/boxplot/mz_{self.mz[int(analyte)]:.3f}.jpg", dpi=200)
+            plt.savefig(f"{self.data_dir}/figures/boxplot/mz_{self.mz[int(analyte)]:.3f}.jpg", dpi=200)
             plt.show()
